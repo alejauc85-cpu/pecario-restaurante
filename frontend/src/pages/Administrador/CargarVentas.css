@@ -1,0 +1,605 @@
+/* ============================================
+   🎨 COLORES DE PECARIO
+   ============================================
+   Principal:    #ef761f (naranja)
+   Secundario:   #1a1a2e (azul oscuro)
+   Fondo:        #f5f0e8 (crema claro)
+   Texto:        #1a1a2e (azul oscuro)
+   ============================================ */
+
+.ventas-container {
+  padding: 2rem;
+  background: #f5f0e8;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ============================================
+   📋 HEADER
+   ============================================ */
+.ventas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ventas-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ventas-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.ventas-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ventas-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  box-shadow: 0 1px 3px rgba(26, 26, 46, 0.08);
+}
+
+.ventas-usuario svg {
+  color: #ef761f;
+}
+
+.loading-spinner {
+  font-size: 0.875rem;
+  color: #ef761f;
+}
+
+/* ============================================
+   🔄 BOTÓN CARGAR
+   ============================================ */
+.btn-cargar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #ef761f;
+  color: #ffffff;
+  border: none;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(239, 118, 31, 0.3);
+}
+
+.btn-cargar:hover:not(:disabled) {
+  background: #f0883a;
+  transform: scale(1.02);
+  box-shadow: 0 6px 20px rgba(239, 118, 31, 0.4);
+}
+
+.btn-cargar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   🔍 BUSCADOR Y FILTROS
+   ============================================ */
+.ventas-buscador {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  align-items: center;
+}
+
+.ventas-buscador-wrapper {
+  flex: 1;
+  position: relative;
+}
+
+.ventas-buscador-icon {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+.ventas-input-buscar {
+  width: 100%;
+  padding: 0.65rem 2.5rem 0.65rem 2.5rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #1a1a2e;
+  background: white;
+  transition: all 0.15s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.ventas-input-buscar:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.2);
+}
+
+.ventas-input-buscar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ventas-buscador-limpiar {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.ventas-buscador-limpiar:hover {
+  background: #f0ede8;
+  color: #1a1a2e;
+}
+
+.ventas-btn-filtros {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.2rem;
+  background: white;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 10px;
+  color: #1a1a2e;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.ventas-btn-filtros:hover:not(:disabled) {
+  border-color: #ef761f;
+  background: #fdf6ed;
+}
+
+.ventas-btn-filtros:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ventas-btn-filtros .rotate {
+  transform: rotate(180deg);
+  transition: transform 0.3s ease;
+}
+
+/* ============================================
+   📋 PANEL DE FILTROS
+   ============================================ */
+.ventas-filtros-panel {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+  border: 1px solid #e8e0d5;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ventas-filtros-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  align-items: end;
+}
+
+.ventas-filtro-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ventas-filtro-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.ventas-filtro-group label svg {
+  color: #ef761f;
+}
+
+.ventas-filtro-input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #1a1a2e;
+  background: white;
+  transition: all 0.15s ease;
+  outline: none;
+  font-family: inherit;
+}
+
+.ventas-filtro-input:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.15);
+}
+
+.ventas-filtro-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ventas-filtro-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1.5rem;
+}
+
+.ventas-filtro-btn-limpiar {
+  padding: 0.5rem 1.2rem;
+  background: transparent;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ventas-filtro-btn-limpiar:hover:not(:disabled) {
+  background: #f0ede8;
+}
+
+.ventas-filtro-btn-limpiar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ventas-filtro-btn-aplicar {
+  padding: 0.5rem 1.5rem;
+  background: #ef761f;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ventas-filtro-btn-aplicar:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.ventas-filtro-btn-aplicar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   📊 RESUMEN
+   ============================================ */
+.ventas-resumen {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #e8e0d5;
+  flex-wrap: wrap;
+}
+
+.ventas-resumen-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ventas-resumen-label {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 450;
+}
+
+.ventas-resumen-valor {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* ============================================
+   📊 TABLA (ESTRUCTURA PRINCIPAL)
+   ============================================ */
+.ventas-table-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(26, 26, 46, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(239, 118, 31, 0.15);
+}
+
+.ventas-table {
+  width: 100%;
+  table-layout: fixed;       /* ✅ Los anchos (%) se respetan siempre dentro del
+                                 100% del contenedor, así la tabla se achica o
+                                 expande completa cuando el sidebar se abre/cierra,
+                                 en vez de que una columna empuje a las demás fuera */
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.ventas-table thead {
+  background: #ef761f;
+  border-bottom: 2px solid #d2d3d3;
+}
+
+.ventas-table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-weight: 600;
+  color: #ffffff;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.ventas-table th:last-child {
+  border-right: none;
+}
+
+.ventas-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.ventas-table tbody tr:nth-child(odd) {
+  background-color: #fdf6ed;
+}
+
+.ventas-table tbody tr:hover {
+  background-color: #fce8d0;
+  transition: background 0.2s ease;
+}
+
+.ventas-table td {
+  padding: 0.85rem 1.25rem;
+  color: #1a1a2e;
+  font-weight: 450;
+  border-right: 1px solid #e8e0d5;
+  border-bottom: 1px solid #e8e0d5;
+}
+
+.ventas-table td:last-child {
+  border-right: none;
+}
+
+.ventas-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.ventas-empty {
+  text-align: center;
+  padding: 3rem !important;
+  color: #a8a29e;
+  font-style: italic;
+  border-right: none !important;
+}
+
+/* ============================================
+   📐 CONTROL DE ANCHOS DE COLUMNAS (en % — suman 100%)
+   ============================================
+   Con table-layout: fixed, estos % son SIEMPRE relativos al ancho
+   real del contenedor .ventas-table-wrapper. Si el sidebar se abre
+   y el contenedor se achica, TODAS las columnas se achican en la
+   misma proporción (Producto y Usuario ya tienen white-space: normal,
+   así que su texto empieza a partir en dos líneas solo, en vez de
+   desbordar y cortar la última columna).
+   ============================================ */
+
+/* Columna 1: Factura */
+.ventas-table th:nth-child(1),
+.ventas-table td:nth-child(1) {
+  width: 11%;
+}
+
+/* Columna 2: Fecha */
+.ventas-table th:nth-child(2),
+.ventas-table td:nth-child(2) {
+  text-align: center;
+  width: 8%;
+}
+
+/* Columna 3: Producto (✅ Permite saltos de línea) */
+.ventas-table th:nth-child(3),
+.ventas-table td:nth-child(3) {
+  width: 14%;
+  white-space: normal;      /* Permite que el texto baje a la siguiente línea */
+  word-wrap: break-word;     /* Rompe palabras largas si es necesario */
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+/* Columna 4: Cantidad */
+.ventas-table th:nth-child(4),
+.ventas-table td:nth-child(4) {
+  width: 7%;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Columna 5: Valor (antes se sobre-expandía y empujaba a Cancelada fuera) */
+.ventas-table th:nth-child(5),
+.ventas-table td:nth-child(5) {
+  width: 9%;
+  white-space: nowrap;
+}
+
+/* Columna 6: Mesa / Caja */
+.ventas-table th:nth-child(6),
+.ventas-table td:nth-child(6) {
+  width: 8%;
+}
+
+/* Columna 7: Forma de pago */
+.ventas-table th:nth-child(7),
+.ventas-table td:nth-child(7) {
+  width: 11%;
+}
+
+/* Columna 8: Usuario (✅ Permite saltos de línea) */
+.ventas-table th:nth-child(8),
+.ventas-table td:nth-child(8) {
+  width: 8%;
+  white-space: normal;      /* Permite que el email baje a la siguiente línea */
+  word-wrap: break-word;     /* Rompe palabras largas */
+  word-break: break-word;
+  line-height: 1.3;
+}
+
+/* Columna 9: Cancelada */
+.ventas-table th:nth-child(9),
+.ventas-table td:nth-child(9) {
+  width:9%;
+  text-align: center;
+}
+
+/* ============================================
+   🏷️ BADGES
+   ============================================ */
+.ventas-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.ventas-badge.efectivo {
+  background: #d4edda;
+  color: #155724;
+}
+
+.ventas-badge.transferencia {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.ventas-badge.datafono {
+  background: #d6d8db;
+  color: #383d41;
+}
+
+.ventas-badge.activa {
+  background: #d4edda;
+  color: #155724;
+}
+
+.ventas-badge.cancelada {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+/* ============================================
+   📱 RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .ventas-container {
+    padding: 1rem;
+  }
+
+  .ventas-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ventas-header-right {
+    justify-content: space-between;
+  }
+
+  .ventas-buscador {
+    flex-direction: column;
+  }
+
+  .ventas-btn-filtros {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ventas-filtros-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ventas-filtro-actions {
+    flex-direction: column;
+  }
+
+  .ventas-resumen {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .ventas-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .ventas-table {
+    font-size: 0.75rem;
+    min-width: 800px;
+  }
+
+  .ventas-table th,
+  .ventas-table td {
+    padding: 0.6rem 0.8rem;
+  }
+}

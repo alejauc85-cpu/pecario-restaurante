@@ -1,0 +1,969 @@
+/* ============================================================
+   🎨 DASHBOARD
+   ============================================================ */
+
+.dashboard {
+  display: flex;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+.dashboard-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-empty {
+  padding: 40px;
+  color: var(--color-ink-soft);
+}
+
+
+/* ============================================================
+   👤 PANTALLA PRINCIPAL DEL EMPLEADO
+   ============================================================ */
+
+.employee-home {
+  flex: 1;
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #f5f0e8;
+
+  padding: 2rem;
+  box-sizing: border-box;
+
+  animation: fadeIn 0.6s ease-out;
+}
+
+.employee-home-content {
+  width: 100%;
+  max-width: 650px;
+
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+}
+
+
+/* ============================================================
+   👤 INFORMACIÓN DEL USUARIO
+   ============================================================ */
+
+.employee-user {
+  margin-bottom: 1.5rem;
+
+  text-align: center;
+
+  animation: employeeWelcome 0.7s ease-out;
+}
+
+.employee-user-label {
+  display: block;
+
+  margin-bottom: 0.25rem;
+
+  font-size: 1rem;
+
+  color: #777;
+
+  font-weight: 500;
+}
+
+.employee-user-name {
+  margin: 0;
+
+  font-size: 1.8rem;
+
+  font-weight: 700;
+
+  color: #1a1a2e;
+
+  letter-spacing: -0.3px;
+}
+
+
+/* ============================================================
+   🖼️ LOGO DEL EMPLEADO
+   ============================================================ */
+
+.employee-logo {
+  display: block;
+
+  width: 300px;
+
+  max-width: 65%;
+
+  height: auto;
+
+  object-fit: contain;
+
+  margin-bottom: 1.5rem;
+
+  filter: drop-shadow(
+    0 10px 30px rgba(0, 0, 0, 0.08)
+  );
+
+  animation: float 3s ease-in-out infinite;
+
+  transition: transform 0.3s ease;
+}
+
+.employee-logo:hover {
+  transform: scale(1.05);
+}
+
+
+/* ============================================================
+   👋 MENSAJE DE BIENVENIDA
+   ============================================================ */
+
+.employee-message {
+  width: 100%;
+
+  text-align: center;
+
+  animation: employeeMessage 0.8s ease-out;
+}
+
+.employee-message h1 {
+  margin: 0 0 0.75rem 0;
+
+  font-size: 2.2rem;
+
+  font-weight: 700;
+
+  color: #1a1a2e;
+}
+
+.employee-message p {
+  margin: 0 auto 1.5rem auto;
+
+  max-width: 430px;
+
+  font-size: 1.05rem;
+
+  line-height: 1.6;
+
+  color: #777;
+}
+
+
+/* ============================================================
+   👉 INDICADOR DEL MENÚ
+   ============================================================ */
+
+.employee-hint {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 0.7rem;
+
+  padding: 0.75rem 1.5rem;
+
+  background: white;
+
+  border: 1px solid #e5e0d8;
+
+  border-radius: 50px;
+
+  color: #777;
+
+  font-size: 0.9rem;
+
+  box-shadow:
+    0 4px 12px rgba(26, 26, 46, 0.08);
+
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.employee-arrow {
+  display: inline-block;
+
+  font-size: 1.2rem;
+
+  font-weight: 700;
+
+  color: #1a1a2e;
+
+  animation: slideArrow 1.5s ease-in-out infinite;
+}
+
+
+/* ============================================================
+   ✨ PANTALLA DE BIENVENIDA ANTIGUA
+   ============================================================ */
+
+.dashboard-welcome {
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+
+  min-height: calc(100vh - 80px);
+
+  padding: 2rem;
+
+  animation: fadeIn 0.6s ease-out;
+}
+
+.welcome-content {
+  text-align: center;
+
+  max-width: 500px;
+
+  width: 100%;
+}
+
+.welcome-logo {
+  max-width: 200px;
+
+  height: auto;
+
+  margin-bottom: 2rem;
+
+  animation: float 3s ease-in-out infinite;
+
+  filter: drop-shadow(
+    0 10px 30px rgba(0, 0, 0, 0.08)
+  );
+
+  transition: transform 0.3s ease;
+}
+
+.welcome-logo:hover {
+  transform: scale(1.05);
+}
+
+.welcome-content h1 {
+  font-size: 2.5rem;
+
+  color: var(--color-ink);
+
+  margin-bottom: 0.75rem;
+
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+}
+
+.welcome-subtitle {
+  font-size: 1.1rem;
+
+  color: var(--color-ink-soft);
+
+  line-height: 1.6;
+
+  margin-bottom: 1.5rem;
+}
+
+.welcome-hint {
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  padding: 0.75rem 1.5rem;
+
+  background: var(--color-surface);
+
+  border-radius: 50px;
+
+  color: var(--color-ink-soft);
+
+  font-size: 0.9rem;
+
+  border: 1px solid var(--color-border);
+
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.welcome-hint .arrow {
+  display: inline-block;
+
+  animation: slideArrow 1.5s ease-in-out infinite;
+}
+
+.welcome-empty {
+  margin-top: 1.5rem;
+
+  padding: 1rem;
+
+  background: #fef3cd;
+
+  color: #856404;
+
+  border-radius: 8px;
+
+  font-size: 0.95rem;
+
+  border: 1px solid #ffc107;
+}
+
+
+/* ============================================================
+   ⏳ ESTADO DE CARGA
+   ============================================================ */
+
+.dashboard-loading {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+
+  min-height: calc(100vh - 80px);
+
+  gap: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+
+  border: 4px solid var(--color-border);
+
+  border-top-color:
+    var(--color-primary, #007bff);
+
+  border-radius: 50%;
+
+  animation: spin 0.8s linear infinite;
+}
+
+.dashboard-loading p {
+  color: var(--color-ink-soft);
+
+  font-size: 1rem;
+}
+
+
+/* ============================================================
+   ❌ ESTADO DE ERROR
+   ============================================================ */
+
+.dashboard-error {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+
+  flex: 1;
+
+  min-height: calc(100vh - 80px);
+
+  padding: 2rem;
+
+  text-align: center;
+}
+
+.dashboard-error .error-icon {
+  font-size: 3rem;
+
+  margin-bottom: 1rem;
+}
+
+.dashboard-error p {
+  color: #dc3545;
+
+  background: #f8d7da;
+
+  padding: 1rem 2rem;
+
+  border-radius: 8px;
+
+  border: 1px solid #f5c6cb;
+
+  max-width: 500px;
+}
+
+
+/* ============================================================
+   👑 DASHBOARD HOME - ADMINISTRADOR
+   ============================================================ */
+
+.dashboard-home {
+  padding: 2rem;
+
+  background: #f5f0e8;
+
+  min-height: 100vh;
+}
+
+
+/* ============================================================
+   HEADER DEL DASHBOARD
+   ============================================================ */
+
+.home-header {
+  margin-top: -2%;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  background: white;
+
+  padding: 1rem 1.5rem;
+
+  border-radius: 12px;
+
+  margin-bottom: 2rem;
+
+  box-shadow:
+    0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.header-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 1rem;
+}
+
+.header-logo {
+  height: 45px;
+
+  width: auto;
+}
+
+.header-left h1 {
+  font-size: 1.5rem;
+
+  font-weight: 700;
+
+  color: #1a1a2e;
+
+  margin: 0;
+}
+
+.header-right .user-badge {
+  display: flex;
+
+  align-items: center;
+
+  gap: 0.5rem;
+
+  background: #f0ede8;
+
+  padding: 0.5rem 1rem;
+
+  border-radius: 100px;
+
+  font-weight: 500;
+
+  color: #1a1a2e;
+}
+
+
+/* ============================================================
+   📊 TARJETAS KPI
+   ============================================================ */
+
+.kpi-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(4, 1fr);
+
+  gap: 1.5rem;
+
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  background: white;
+
+  padding: 1.5rem;
+
+  border-radius: 12px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  box-shadow:
+    0 4px 12px rgba(26, 26, 46, 0.08);
+
+  transition:
+    transform 0.2s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.kpi-content {
+  display: flex;
+
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+
+  font-weight: 600;
+
+  color: #666;
+
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-size: 1.8rem;
+
+  font-weight: 700;
+
+  color: #1a1a2e;
+
+  margin: 0.25rem 0;
+}
+
+.kpi-detail {
+  font-size: 0.85rem;
+
+  color: #999;
+}
+
+.kpi-icon {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+
+/* ============================================================
+   🎨 COLORES KPI
+   ============================================================ */
+
+.card-sales {
+  background: #2d89ef;
+
+  color: white;
+}
+
+.card-sales .kpi-label,
+.card-sales .kpi-detail {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-sales .kpi-value {
+  color: white;
+}
+
+.card-products {
+  background: #2ecc71;
+
+  color: white;
+}
+
+.card-products .kpi-label,
+.card-products .kpi-detail {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-products .kpi-value {
+  color: white;
+}
+
+.card-clients {
+  background: #f39c12;
+
+  color: white;
+}
+
+.card-clients .kpi-label,
+.card-clients .kpi-detail {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-clients .kpi-value {
+  color: white;
+}
+
+.card-employees {
+  background: #e74c3c;
+
+  color: white;
+}
+
+.card-employees .kpi-label,
+.card-employees .kpi-detail {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.card-employees .kpi-value {
+  color: white;
+}
+
+
+/* ============================================================
+   📈 GRÁFICOS
+   ============================================================ */
+
+.chart-section {
+  background: white;
+
+  padding: 1.5rem;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 12px rgba(26, 26, 46, 0.08);
+
+  margin-bottom: 2rem;
+}
+
+.chart-section h2 {
+  font-size: 1.25rem;
+
+  margin-bottom: 1rem;
+
+  color: #1a1a2e;
+}
+
+.chart-container {
+  width: 100%;
+
+  height: 300px;
+}
+
+
+/* ============================================================
+   📋 SECCIÓN INFERIOR
+   ============================================================ */
+
+.home-bottom-grid {
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 1.5rem;
+}
+
+.bottom-card {
+  background: white;
+
+  padding: 1.5rem;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.bottom-card h3 {
+  font-size: 1rem;
+
+  margin: 0 0 1rem 0;
+
+  color: #1a1a2e;
+}
+
+.recent-list {
+  list-style: none;
+
+  padding: 0;
+
+  margin: 0;
+}
+
+.recent-list li {
+  display: flex;
+
+  justify-content: space-between;
+
+  padding: 0.5rem 0;
+
+  border-bottom:
+    1px solid #f0ede8;
+}
+
+.recent-list li:last-child {
+  border-bottom: none;
+}
+
+.home-loading {
+  text-align: center;
+
+  padding: 3rem;
+
+  color: #999;
+}
+
+
+/* ============================================================
+   🎞️ ANIMACIONES
+   ============================================================ */
+
+@keyframes fadeIn {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes employeeWelcome {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-15px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes employeeMessage {
+
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(15px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform:
+      translateY(0);
+  }
+
+  50% {
+    transform:
+      translateY(-12px);
+  }
+}
+
+@keyframes spin {
+
+  to {
+    transform:
+      rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+
+    transform:
+      scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+
+    transform:
+      scale(0.98);
+  }
+}
+
+@keyframes slideArrow {
+
+  0%,
+  100% {
+    transform:
+      translateX(0);
+  }
+
+  50% {
+    transform:
+      translateX(8px);
+  }
+}
+
+
+/* ============================================================
+   📱 RESPONSIVE - TABLET
+   ============================================================ */
+
+@media (max-width: 1024px) {
+
+  .kpi-grid {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .employee-logo {
+    width: 280px;
+  }
+}
+
+
+/* ============================================================
+   📱 RESPONSIVE - MÓVIL
+   ============================================================ */
+
+@media (max-width: 768px) {
+
+  .dashboard-home {
+    padding: 1rem;
+  }
+
+  .home-header {
+    flex-direction: column;
+
+    align-items: flex-start;
+
+    gap: 1rem;
+  }
+
+  .kpi-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .home-bottom-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+  .employee-home {
+    min-height:
+      calc(100vh - 60px);
+
+    padding: 1rem;
+  }
+
+  .employee-user-name {
+    font-size: 1.5rem;
+  }
+
+  .employee-logo {
+    width: 240px;
+
+    max-width: 70%;
+  }
+
+  .employee-message h1 {
+    font-size: 1.8rem;
+  }
+
+  .employee-message p {
+    font-size: 0.95rem;
+  }
+
+  .employee-hint {
+    font-size: 0.8rem;
+
+    padding:
+      0.6rem 1.2rem;
+  }
+
+  .dashboard-welcome {
+    padding: 1rem;
+
+    min-height:
+      calc(100vh - 60px);
+  }
+
+  .welcome-logo {
+    max-width: 150px;
+  }
+
+  .welcome-content h1 {
+    font-size: 2rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 1rem;
+  }
+
+  .welcome-hint {
+    font-size: 0.8rem;
+
+    padding:
+      0.5rem 1rem;
+  }
+}
+
+
+/* ============================================================
+   📱 RESPONSIVE - TELÉFONO PEQUEÑO
+   ============================================================ */
+
+@media (max-width: 480px) {
+
+  .employee-user-name {
+    font-size: 1.3rem;
+  }
+
+  .employee-logo {
+    width: 190px;
+
+    max-width: 75%;
+  }
+
+  .employee-message h1 {
+    font-size: 1.5rem;
+  }
+
+  .employee-message p {
+    font-size: 0.9rem;
+  }
+
+  .welcome-logo {
+    max-width: 120px;
+  }
+
+  .welcome-content h1 {
+    font-size: 1.5rem;
+  }
+
+  .welcome-subtitle {
+    font-size: 0.9rem;
+  }
+}

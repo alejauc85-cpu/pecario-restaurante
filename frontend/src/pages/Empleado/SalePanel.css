@@ -1,0 +1,1103 @@
+/* ============================================
+   SALE PANEL - ESTILOS COMPLETOS
+   ============================================ */
+
+/* Contenedor principal */
+.sale-panel {
+  height: 100%;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* ============================================
+   HEADER
+   ============================================ */
+
+.sale-panel-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 36px 40px 0;
+}
+
+.sale-panel-header h1 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 26px;
+  margin: 0;
+  color: var(--color-ink);
+}
+
+.sale-panel-status-pill {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(28, 27, 26, 0.06);
+  color: var(--color-ink-faint);
+}
+
+.sale-panel-status-pill.is-open {
+  background: rgba(34, 139, 84, 0.14);
+  color: #ef761f;
+}
+
+.sale-panel-status-pill.cashier-mode {
+  background: #be5e19b7;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sale-panel-status-pill.printed {
+  background: #ef761f94;
+  color: white;
+}
+
+.sale-panel-loading {
+  padding: 40px;
+  color: var(--color-ink-soft);
+}
+
+/* ============================================
+   BODY - OCUPA TODO EL ANCHO
+   ============================================ */
+
+.sale-panel-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 24px 40px 40px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* ============================================
+   TARJETA DE PRODUCTOS
+   ============================================ */
+
+.addables-card {
+  border: 1px solid #ef761f;
+  background: #ef761f8a;
+  border-radius: var(--radius-md);
+  padding: 18px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.addables-title {
+  margin: 0 0 12px;
+  font-size: 12.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #ffffff;
+  text-align: center;
+}
+
+/* ============================================
+   CAMPO DE BÚSQUEDA
+   ============================================ */
+
+.addables-search-wrap {
+  position: relative;
+  margin-bottom: 14px;
+  width: 100%;
+}
+
+.addables-search {
+  width: 100%;
+  border: 1.5px solid #ef761f;
+  border-radius: 999px;
+  padding: 11px 40px 11px 16px;
+  font-size: 14px;
+  color: var(--color-ink);
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.addables-search:focus {
+  outline: none;
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px #ef761f;
+}
+
+.addables-search-icon {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ef761f;
+  pointer-events: none;
+}
+
+/* ============================================
+   DROPDOWN - GRID DE 3 COLUMNAS
+   ============================================ */
+
+.addables-dropdown {
+  position: absolute;
+  z-index: 9999;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 400px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lift);
+  padding: 8px;
+  width: 100%;
+  min-width: 100%;
+  box-sizing: border-box;
+}
+
+.addables-dropdown-empty {
+  margin: 0;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--color-ink-faint);
+  text-align: center;
+  grid-column: 1 / -1;
+}
+
+.addables-dropdown-grid {
+  display: grid !important;
+  grid-template-columns: repeat(3, 1fr) !important;
+  gap: 6px !important;
+  width: 100% !important;
+}
+
+.addables-dropdown-item-wrapper {
+  display: flex;
+  align-items: stretch;
+  gap: 4px;
+  min-width: 0;
+}
+
+.addables-dropdown-item-wrapper .addables-dropdown-item {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  border: 1.5px solid transparent;
+  background: #b960212a;
+  padding: 10px 10px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 12.5px;
+  color: var(--color-ink);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+  width: 100%;
+  overflow: hidden;
+}
+
+.addables-dropdown-item-wrapper .addables-dropdown-item:hover {
+  background: rgba(235, 157, 94, 0.685);
+  border-color: #ef761f;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(176, 88, 53, 0.15);
+}
+
+.addables-dropdown-item-wrapper .addables-dropdown-item:active {
+  transform: scale(0.97);
+}
+
+.addables-dropdown-item-wrapper .addables-dropdown-item .item-name {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.3;
+  word-break: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  width: 100%;
+}
+
+.addables-dropdown-item-wrapper .addables-dropdown-item .item-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ef761f;
+  white-space: nowrap;
+}
+
+.addables-dropdown-add-more {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border: 1.5px dashed #ef761f;
+  border-radius: 50%;
+  background: #fff;
+  color: #ef761f;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  padding: 0;
+  margin-top: 2px;
+  align-self: flex-start;
+}
+
+.addables-dropdown-add-more:hover {
+  background: #f2fbf5;
+  border-color: #ef761f;
+  transform: scale(1.1);
+}
+
+.addables-dropdown-add-more:active {
+  transform: scale(0.9);
+  background: #da8b5270;
+}
+
+.addables-dropdown-actions {
+  padding: 4px 4px 8px 4px;
+  border-bottom: 1px solid var(--color-line, #e5e7eb);
+  margin-bottom: 8px;
+  grid-column: 1 / -1;
+}
+
+.addables-multi-toggle {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--color-line, #d1d5db);
+  border-radius: var(--radius-sm, 6px);
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--color-ink-soft, #6b7280);
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.addables-multi-toggle:hover {
+  background: var(--color-bg-alt, #f3f4f6);
+  border-color: #9ca3af;
+}
+
+.addables-multi-toggle.is-active {
+  border-color: #ef761f;
+  background: #ecfdf5;
+  color: #065f46;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* ============================================
+   PILLS - PRODUCTOS SELECCIONADOS
+   ============================================ */
+
+.addables-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.addable-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1.5px dashed #ef761f;
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 8px 7px 14px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.addable-pill-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.addable-pill-qty {
+  font-weight: 500;
+  color: var(--color-ink-soft);
+}
+
+.addable-pill-price {
+  font-size: 13px;
+  font-weight: 700;
+  color: #ef761f;
+  white-space: nowrap;
+}
+
+.addable-pill-remove {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: #f7c9c9;
+  color: #a41f1f;
+}
+
+.addable-pill-remove:hover {
+  background: #f3a9a9;
+}
+
+.addables-total {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #ffffff;
+  border-top: 1px dashed #ffffff;
+  padding-top: 12px;
+}
+
+.sale-panel-empty {
+  margin: 0 0 14px;
+  font-size: 13px;
+  color: #ffffffee;
+  text-align: center;
+}
+
+/* ============================================
+   TOTALES / PROPINA
+   ============================================ */
+
+.sale-totals {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sale-totals-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13.5px;
+  color: var(--color-ink-soft);
+}
+
+.sale-totals-editable input {
+  width: 100px;
+  text-align: right;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 6px 8px;
+  font-size: 13px;
+  color: var(--color-ink);
+}
+
+.sale-totals-final {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-ink);
+  border-top: 1px solid var(--color-line);
+  padding-top: 10px;
+}
+
+/* ============================================
+   PAGO - CON CAMBIO VISUAL
+   ============================================ */
+
+.sale-payment {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--color-line);
+  padding-top: 16px;
+}
+
+.sale-payment-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sale-payment-row label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-ink-soft);
+}
+
+.sale-payment-row input,
+.sale-payment-row select {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--color-ink);
+  background: #fff;
+  min-width: 140px;
+}
+
+/* Input con cambio */
+.sale-payment-row input.has-change {
+  border-color: #ef761f9c;
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+  background: #ce824b63
+}
+
+/* Input con pago insuficiente */
+.sale-payment-row input.has-insufficient {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+  background: #ce824b63;
+}
+
+/* Contenedor del cambio */
+.sale-cambio-container {
+  margin-top: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  background: #ce824b63;
+  border: 2px solid #e67b2f83;
+  animation: fadeInUp 0.3s ease;
+}
+
+.sale-cambio-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sale-cambio-label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ef761f;
+}
+
+.sale-cambio-monto {
+  font-size: 24px;
+  font-weight: 700;
+  color: #ef761f;
+  font-variant-numeric: tabular-nums;
+}
+
+.sale-cambio-exacto {
+  margin: 4px 0 0 0;
+  font-size: 13px;
+  color: #ef761f;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Pago insuficiente */
+.sale-pago-insuficiente {
+  margin-top: 8px;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  background: #ce824b63;
+  border: 2px solid #dc2626;
+  color: #dc2626;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: center;
+  animation: fadeInUp 0.3s ease;
+}
+
+/* Animación */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sale-payment-hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--color-ink-faint);
+  background: rgba(28, 27, 26, 0.05);
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+}
+
+.sale-payment-change {
+  background: rgba(34, 139, 84, 0.12);
+  color: #1f7a43;
+  font-weight: 600;
+}
+
+/* ============================================
+   ACCIONES - BOTONES
+   ============================================ */
+
+.sale-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sale-btn {
+  flex: 1;
+  min-width: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sale-btn:active {
+  transform: scale(0.98);
+}
+
+.sale-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.sale-btn-ghost {
+  background: #fff;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink-soft);
+}
+
+.sale-btn-ghost:hover:not(:disabled) {
+  color: var(--color-ink);
+  border-color: var(--color-ink);
+}
+
+.sale-btn-ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sale-btn-success {
+  background: #ef761f;
+  color: #fff;
+  border: none;
+}
+
+.sale-btn-success:hover:not(:disabled) {
+  background: #ef761f;
+  filter: brightness(1.05);
+}
+
+.sale-btn-primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.sale-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.sale-btn-disabled {
+  background: #d1d5db;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border: none;
+}
+
+.sale-btn-disabled:hover {
+  background: #d1d5db;
+  filter: none;
+}
+
+.sale-btn-accent {
+  background: #093b59;
+  color: #fff;
+}
+
+.sale-btn-accent:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.sale-btn-cashier {
+  background: #059669;
+  color: #fff;
+}
+
+.sale-btn-cashier:hover:not(:disabled) {
+  background: #047857;
+  filter: brightness(1.05);
+}
+
+/* ============================================
+   VISOR PDF
+   ============================================ */
+
+.pdf-viewer-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.pdf-viewer-modal {
+  background: #fff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 900px;
+  height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+}
+
+.pdf-viewer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.pdf-viewer-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.pdf-viewer-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #6b7280;
+  padding: 4px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+}
+
+.pdf-viewer-close:hover {
+  background: #f3f4f6;
+}
+
+.pdf-viewer-body {
+  flex: 1;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.pdf-viewer-actions {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px;
+  background: #fff;
+  border-top: 1px solid #e5e7eb;
+  flex-shrink: 0;
+}
+
+.pdf-viewer-btn {
+  flex: 1;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.pdf-viewer-btn-secondary {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.pdf-viewer-btn-secondary:hover {
+  background: #e5e7eb;
+}
+
+.pdf-viewer-btn-primary {
+  background: #1f7a43;
+  color: #fff;
+}
+
+.pdf-viewer-btn-primary:hover {
+  background: #166534;
+}
+
+/* ============================================
+   IMPRESIÓN 80mm - IMPRESORA TÉRMICA
+   ============================================ */
+
+@media print {
+  /* Ocultar todo lo que no sea la factura */
+  body * {
+    visibility: hidden;
+  }
+  
+  #factura-content,
+  #factura-content * {
+    visibility: visible;
+  }
+  
+  #factura-content {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 80mm;
+    padding: 0;
+    margin: 0;
+    background: white;
+  }
+
+  .factura-preview-overlay,
+  .factura-preview-modal,
+  .factura-preview-header,
+  .factura-preview-actions {
+    display: none !important;
+  }
+
+  .factura-preview-content {
+    all: unset !important;
+    display: block !important;
+    width: 80mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: white !important;
+  }
+
+  .factura-paper-80 {
+    all: unset !important;
+    display: block !important;
+    width: 80mm !important;
+    padding: 8px 10px !important;
+    margin: 0 !important;
+    background: white !important;
+    font-family: 'Courier New', monospace !important;
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+    color: #000 !important;
+  }
+
+  .factura-80-logo {
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+
+  .factura-80-logo-img {
+    max-width: 80px !important;
+    max-height: 40px !important;
+  }
+
+  .factura-80-titulo {
+    font-size: 14px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    margin: 0 0 2px 0 !important;
+  }
+
+  .factura-80-direccion,
+  .factura-80-telefono {
+    font-size: 8px !important;
+    text-align: center !important;
+    margin: 1px 0 !important;
+    color: #333 !important;
+  }
+
+  .factura-80-mesa {
+    font-size: 11px !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    margin: 2px 0 !important;
+  }
+
+  .factura-80-fecha {
+    font-size: 8px !important;
+    text-align: center !important;
+    margin: 2px 0 !important;
+    color: #666 !important;
+  }
+
+  .factura-80-divider {
+    text-align: center !important;
+    color: #000 !important;
+    margin: 2px 0 !important;
+    font-size: 10px !important;
+  }
+
+  .factura-80-columnas {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    font-weight: bold !important;
+    font-size: 9px !important;
+    padding: 2px 0 !important;
+    border-bottom: 1px dashed #000 !important;
+  }
+
+  .factura-80-item {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 2px 0 !important;
+    font-size: 9px !important;
+  }
+
+  .factura-80-item-nombre {
+    flex: 1 !important;
+    text-align: left !important;
+  }
+
+  .factura-80-item-detalle {
+    display: flex !important;
+    flex-direction: row !important;
+    gap: 8px !important;
+  }
+
+  .factura-80-item-cant {
+    text-align: center !important;
+    min-width: 20px !important;
+  }
+
+  .factura-80-item-precio {
+    text-align: right !important;
+    min-width: 50px !important;
+  }
+
+  .factura-80-totales {
+    margin-top: 4px !important;
+    padding-top: 4px !important;
+    border-top: 1px dashed #000 !important;
+  }
+
+  .factura-80-total-line {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    padding: 2px 0 !important;
+    font-size: 10px !important;
+  }
+
+  .factura-80-propina {
+    color: #059669 !important;
+    font-weight: bold !important;
+  }
+
+  .factura-80-total-final {
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border-top: 2px solid #000 !important;
+    padding-top: 4px !important;
+    margin-top: 2px !important;
+  }
+
+  .factura-80-pago {
+    margin-top: 4px !important;
+    padding-top: 4px !important;
+    border-top: 1px dashed #000 !important;
+    font-size: 9px !important;
+  }
+
+  .factura-80-pago p {
+    margin: 2px 0 !important;
+    display: flex !important;
+    justify-content: space-between !important;
+  }
+
+  .factura-80-footer {
+    text-align: center !important;
+    margin-top: 6px !important;
+    padding-top: 4px !important;
+    border-top: 1px dashed #000 !important;
+  }
+
+  .factura-80-gracias {
+    font-size: 12px !important;
+    font-weight: bold !important;
+    margin: 2px 0 !important;
+  }
+
+  .factura-80-vuelva {
+    font-size: 8px !important;
+    color: #666 !important;
+    margin: 2px 0 !important;
+  }
+}
+
+/* ============================================
+   RESPONSIVE - MEJORADO CON CAMBIO
+   ============================================ */
+
+@media (max-width: 992px) {
+  .addables-dropdown-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .sale-panel-body {
+    padding: 16px 20px 30px;
+  }
+  
+  .sale-panel-header {
+    padding: 24px 20px 0;
+    flex-wrap: wrap;
+  }
+  
+  .sale-panel-header h1 {
+    font-size: 22px;
+  }
+  
+  .caja-summary {
+    margin: 20px 20px 0;
+  }
+  
+  .sale-cambio-monto {
+    font-size: 20px;
+  }
+  
+  .sale-cambio-box {
+    flex-direction: column;
+    gap: 4px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .sale-panel-body {
+    padding: 12px 16px 20px;
+  }
+  
+  .sale-panel-header {
+    padding: 16px 16px 0;
+  }
+  
+  .sale-panel-header h1 {
+    font-size: 18px;
+  }
+  
+  .sale-panel-status-pill {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+  
+  .addables-card {
+    padding: 12px;
+  }
+  
+  .addables-search {
+    font-size: 13px;
+    padding: 9px 36px 9px 14px;
+  }
+  
+  .addables-dropdown-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 4px !important;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item {
+    padding: 8px 8px 6px;
+    font-size: 11.5px;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item .item-name {
+    font-size: 11px;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item .item-price {
+    font-size: 11px;
+  }
+  
+  .addables-dropdown-add-more {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .addables-dropdown-add-more svg {
+    width: 12px;
+    height: 12px;
+  }
+  
+  .sale-payment-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+  }
+  
+  .sale-payment-row input,
+  .sale-payment-row select {
+    min-width: unset;
+    width: 100%;
+  }
+  
+  .sale-btn {
+    min-width: 80px;
+    padding: 10px;
+    font-size: 12px;
+  }
+  
+  .sale-totals-row {
+    font-size: 12.5px;
+  }
+  
+  .sale-totals-final {
+    font-size: 14px;
+  }
+  
+  .sale-cambio-monto {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 400px) {
+  .addables-dropdown-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item {
+    padding: 10px 12px;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item .item-name {
+    font-size: 13px;
+  }
+  
+  .addables-dropdown-item-wrapper .addables-dropdown-item .item-price {
+    font-size: 13px;
+  }
+  
+  .addables-dropdown {
+    max-height: 280px;
+  }
+  
+  .sale-actions {
+    flex-direction: column;
+  }
+  
+  .sale-btn {
+    min-width: unset;
+    width: 100%;
+  }
+}

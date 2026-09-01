@@ -1,0 +1,76 @@
+:root {
+  /* Color */
+  --color-bg: #f5f2ec;
+  --color-bg-alt: #ffffff;
+  --color-ink: #1c1b1a;
+  --color-ink-soft: #6b6560;
+  --color-ink-faint: #9a938c;
+  --color-line: rgba(28, 27, 26, 0.09);
+  --color-accent: #c1440e;
+  --color-accent-ink: #ffffff;
+  --color-accent-soft: rgba(193, 68, 14, 0.12);
+
+  /* Role accents */
+  --role-admin: #b08d57;
+  --role-admin-soft: rgba(176, 141, 87, 0.14);
+  --role-cocina: #6b7a5e;
+  --role-cocina-soft: rgba(107, 122, 94, 0.14);
+  --role-mesero: #4a5b6b;
+  --role-mesero-soft: rgba(74, 91, 107, 0.14);
+
+  /* Type */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI", Roboto, sans-serif;
+
+  /* Shape */
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --radius-sm: 9px;
+  --shadow-soft: 0 1px 2px rgba(28, 27, 26, 0.04), 0 12px 32px -12px rgba(28, 27, 26, 0.18);
+  --shadow-lift: 0 1px 2px rgba(28, 27, 26, 0.05), 0 24px 48px -16px rgba(28, 27, 26, 0.28);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+button {
+  font-family: inherit;
+}
+
+input {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

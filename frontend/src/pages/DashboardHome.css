@@ -1,0 +1,231 @@
+/* DashboardHome.css */
+.dashboard-home {
+  padding: 2rem;
+  background: #f5f0e8;
+  min-height: 100vh;
+}
+
+/* ============================================
+   HEADER (USUARIO IZQ - CENTRO - LOGO DERECHA)
+   ============================================ */
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.header-left .user-badge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f0ede8;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.header-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.header-center h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 45px;
+  width: auto;
+}
+
+/* ============================================
+   ✨ TARJETAS CON EFECTO 3D METÁLICO
+   ============================================ */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.kpi-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: transform 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.3), 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.kpi-card:hover {
+  transform: translateY(-4px);
+}
+
+.kpi-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.kpi-value {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0.25rem 0;
+}
+
+.kpi-detail {
+  font-size: 0.85rem;
+}
+
+.kpi-icon {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* --- Tarjeta 1: Ventas (Negro 3D) --- */
+.card-sales {
+  background: linear-gradient(to bottom, #4a4a4a 0%, #2a2a2a 40%, #0a0a0a 100%) !important;
+  color: white !important;
+}
+.card-sales .kpi-label, .card-sales .kpi-detail { color: rgba(255,255,255,0.7) !important; }
+.card-sales .kpi-value { color: white !important; }
+
+/* --- Tarjeta 2: Productos (Cobre/Naranja 3D) --- */
+.card-products {
+  background: linear-gradient(to bottom, #f28e5c 0%, #d26030 40%, #8a3a1a 100%) !important;
+  color: white !important;
+}
+.card-products .kpi-label, .card-products .kpi-detail { color: rgba(255,255,255,0.7) !important; }
+.card-products .kpi-value { color: white !important; }
+
+/* --- Tarjeta 3: Clientes (Bronce/Dorado 3D) --- */
+.card-clients {
+  background: linear-gradient(to bottom, #f5c76b 0%, #d99f36 40%, #8a631a 100%) !important;
+  color: white !important;
+}
+.card-clients .kpi-label, .card-clients .kpi-detail { color: rgba(255,255,255,0.7) !important; }
+.card-clients .kpi-value { color: white !important; }
+
+/* --- Tarjeta 4: Empleados (Gris Blanco / Plata Brillante 3D) --- */
+.card-employees {
+  background: linear-gradient(to bottom, #f0f0f0 0%, #d5d5d5 40%, #b0b0b0 100%) !important;
+  color: #1a1a2e !important;
+  border: 1px solid #c0c0c0 !important;
+  box-shadow: inset 0 2px 4px rgba(255,255,255,0.5), 0 4px 12px rgba(0,0,0,0.15) !important;
+}
+.card-employees .kpi-label, .card-employees .kpi-detail { color: rgba(26,26,46,0.6) !important; }
+.card-employees .kpi-value { color: #1a1a2e !important; }
+
+/* ============================================
+   📈 GRÁFICO DE VENTAS
+   ============================================ */
+.chart-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+  margin-bottom: 2rem;
+}
+
+.chart-section h2 {
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+  color: #1a1a2e;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+}
+
+.recharts-surface{
+  height: 94% !important;
+}
+
+
+/* ============================================
+   📋 SECCIÓN INFERIOR (2 columnas)
+   ============================================ */
+.home-bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.bottom-card {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.bottom-card h3 {
+  font-size: 1rem;
+  margin: 0 0 1rem 0;
+  color: #1a1a2e;
+}
+
+.recent-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.recent-list li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0ede8;
+}
+
+.recent-list li:last-child {
+  border-bottom: none;
+}
+
+.home-loading {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .kpi-grid {
+    grid-template-columns: 1fr;
+  }
+  .home-bottom-grid {
+    grid-template-columns: 1fr;
+  }
+}

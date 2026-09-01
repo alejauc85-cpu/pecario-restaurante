@@ -1,0 +1,590 @@
+/* ============================================
+   🎨 ARQUEO DE CAJA - ESTILOS COMPLETOS
+   ============================================ */
+
+.arqueo-container {
+  padding: 2rem;
+  background: #f5f0e8;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ============================================
+   📋 HEADER Y CONTROLES
+   ============================================ */
+.arqueo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.arqueo-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.loading-spinner {
+  color: #ef761f;
+  font-size: 0.875rem;
+}
+
+.arqueo-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  background: white;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e8e0d5;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.arqueo-fecha {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.arqueo-input-fecha {
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  background: white;
+  transition: all 0.15s ease;
+}
+
+.arqueo-input-fecha:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.15);
+}
+
+.btn-consultar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #ef761f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-consultar:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.btn-consultar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  100% { transform: rotate(360deg); }
+}
+
+/* ============================================
+   📋 CUADRO DE CIERRE DE CAJA (Como tu Excel)
+   ============================================ */
+.arqueo-cuadro {
+  background: white;
+  border: 2px solid #1a1a2e;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.arqueo-cuadro-titulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  text-align: center;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid #e8e0d5;
+  padding-bottom: 0.5rem;
+}
+
+.arqueo-fila {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.arqueo-fila:last-child {
+  border-bottom: none;
+}
+
+.arqueo-etiqueta {
+  font-weight: 500;
+  color: #1a1a2e;
+  font-size: 0.95rem;
+}
+
+.arqueo-input-manual {
+  width: 180px;
+  padding: 0.4rem 0.75rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  text-align: right;
+  outline: none;
+  background: white;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.arqueo-input-manual:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.15);
+}
+
+.arqueo-input-manual:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.arqueo-automatico {
+  background: #fdf6ed;
+  padding: 0.75rem 0.5rem;
+  border-radius: 6px;
+}
+
+.arqueo-valor {
+  font-weight: 700;
+  font-size: 1.1rem;
+  color: #1a1a2e;
+}
+
+.arqueo-resultado {
+  padding: 0.75rem 0.5rem;
+  border-radius: 6px;
+  margin-top: 0.5rem;
+}
+
+.arqueo-mensaje {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+/* Colores de resultados */
+.resultado-perfecto {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.resultado-faltante {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.resultado-sobrante {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* ============================================
+   ✅ BADGE DE CAJA CERRADA (NUEVO)
+   ============================================ */
+.arqueo-cerrada-badge {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+  font-weight: 700;
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+/* ============================================
+   📊 INFO Y FECHA DE CONSULTA
+   ============================================ */
+.arqueo-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: white;
+  padding: 0.75rem 1.25rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e8e0d5;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+}
+
+.arqueo-info span {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+/* ============================================
+   📋 TABLAS (VENTAS Y GASTOS)
+   ============================================ */
+.arqueo-seccion {
+  margin-bottom: 2rem;
+}
+
+.arqueo-seccion-titulo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 1rem;
+}
+
+.arqueo-table-wrapper {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+  overflow: hidden;
+  border: 1px solid #e8e0d5;
+}
+
+.arqueo-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.arqueo-table thead {
+  background: #1a1a2e;
+}
+
+.arqueo-table th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.arqueo-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #e8e0d5;
+  color: #1a1a2e;
+}
+
+.arqueo-table tbody tr:nth-child(even) {
+  background-color: #fdf6ed;
+}
+
+.arqueo-table tbody tr:hover {
+  background-color: #fce8d0;
+}
+
+.arqueo-empty {
+  text-align: center;
+  padding: 2rem !important;
+  color: #a8a29e;
+  font-style: italic;
+}
+
+/* ============================================
+   🏷️ BADGES (Forma de pago)
+   ============================================ */
+.estado-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  letter-spacing: 0.03em;
+}
+
+.estado-badge.efectivo {
+  background: #d4edda;
+  color: #155724;
+}
+
+.estado-badge.transferencia {
+  background: #cce5ff;
+  color: #004085;
+}
+
+.estado-badge.datafono {
+  background: #d6d8db;
+  color: #383d41;
+}
+
+/* ============================================
+   📱 RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+  .arqueo-container {
+    padding: 1rem;
+  }
+  .arqueo-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .arqueo-fecha {
+    width: 100%;
+  }
+  .arqueo-input-fecha {
+    width: 100%;
+  }
+  .btn-consultar {
+    width: 100%;
+    justify-content: center;
+  }
+  .arqueo-cuadro {
+    max-width: 100%;
+  }
+  .arqueo-input-manual {
+    width: 120px;
+  }
+  .arqueo-table-wrapper {
+    overflow-x: auto;
+  }
+  .arqueo-table {
+    min-width: 600px;
+  }
+}
+
+/* ============================================
+   🔘 BOTONES EXTRA (Abrir Caja / Guardar Cierre)
+   ============================================ */
+
+.btn-abrir-caja {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.2);
+}
+
+.btn-abrir-caja:hover:not(:disabled) {
+  background: #2d2d4a;
+  transform: scale(1.02);
+}
+
+.btn-abrir-caja:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-guardar-cierre {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  margin-top: 1rem;
+  background: #ef761f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  justify-content: center;
+}
+
+.btn-guardar-cierre:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.btn-guardar-cierre:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   🟰 MODAL DE APERTURA DE CAJA
+   ============================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 704px;
+    padding: 1.5rem;
+    box-shadow: 0 20px 60px rgba(26, 26, 46, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #1a1a2e;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #666;
+  padding: 0.25rem;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: #1a1a2e;
+}
+
+.modal-close:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-body {
+      margin-top: -3%;
+    padding: 0.5rem 0;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.875rem;
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  outline: none;
+  background: white;
+  font-size: 0.875rem;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.form-input:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.15);
+}
+
+.form-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid #e8e0d5;
+}
+
+.btn-cancelar {
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  background: #f0ede8;
+}
+
+.btn-cancelar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-guardar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #ef761f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-reabrir-caja {
+  margin-top: 0.5rem;
+  padding: 0.4rem 1rem;
+  background: transparent;
+  border: 1.5px solid #ef761f;
+  color: #ef761f;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-reabrir-caja:hover:not(:disabled) {
+  background: #fdf6ed;
+}
+
+.btn-reabrir-caja:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

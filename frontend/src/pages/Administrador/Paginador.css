@@ -1,0 +1,97 @@
+/* ============================================
+   📄 PAGINADOR - COLORES PECARIO
+   ============================================ */
+.paginador-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: white;
+  border-top: 1px solid #ede8e0;
+  border-radius: 0 0 16px 16px;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.paginador-info {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 450;
+}
+
+.paginador-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.paginador-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #e5e0d8;
+  border-radius: 8px;
+  background: white;
+  color: #1a1a2e;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.paginador-btn:hover:not(:disabled):not(.is-active) {
+  background: #fdf8f0;
+  border-color: #d4a13e;
+}
+
+.paginador-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.paginador-numero {
+  min-width: 36px;
+  width: auto;
+  padding: 0 0.5rem;
+}
+
+.paginador-numero.is-active {
+  background: #d4a13e;
+  border-color: #d4a13e;
+  color: #1a1a2e;
+  font-weight: 600;
+}
+
+.paginador-numero.is-active:hover {
+  background: #e0b04e;
+  border-color: #e0b04e;
+}
+
+/* ============================================
+   📱 RESPONSIVE
+   ============================================ */
+@media (max-width: 600px) {
+  .paginador-container {
+    flex-direction: column;
+    align-items: center;
+    padding: 0.75rem 1rem;
+  }
+
+  .paginador-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .paginador-btn {
+    width: 32px;
+    height: 32px;
+    font-size: 0.75rem;
+  }
+
+  .paginador-numero {
+    min-width: 32px;
+    padding: 0 0.35rem;
+  }
+}

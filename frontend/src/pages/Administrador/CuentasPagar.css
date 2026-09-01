@@ -1,0 +1,372 @@
+.cuentas-pagar-container {
+  padding: 2rem;
+  background: #f5f0e8;
+  min-height: 100vh;
+}
+
+.cuentas-pagar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.cuentas-pagar-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.cuentas-pagar-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.cuentas-pagar-header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.cuentas-pagar-usuario {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  box-shadow: 0 1px 3px rgba(26, 26, 46, 0.08);
+}
+
+.cuentas-pagar-usuario svg {
+  color: #ef761f;
+}
+
+.loading-spinner {
+  font-size: 0.875rem;
+  color: #ef761f;
+}
+
+.btn-crear {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1.5rem;
+  background: #ef761f;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(239, 118, 31, 0.3);
+}
+
+.btn-crear:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.btn-crear:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cuentas-pagar-buscador {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.buscador-input {
+  width: 100%;
+  padding: 0.65rem 1rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  background: white;
+  outline: none;
+}
+
+.buscador-input:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.2);
+}
+
+.buscador-limpiar {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+}
+
+.cuentas-pagar-table-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(26, 26, 46, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(239, 118, 31, 0.15);
+}
+
+.cuentas-pagar-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cuentas-pagar-table thead {
+  background: #ef761f;
+}
+
+.cuentas-pagar-table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cuentas-pagar-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.cuentas-pagar-table tbody tr:nth-child(odd) {
+  background-color: #fdf6ed;
+}
+
+.cuentas-pagar-table tbody tr:hover {
+  background-color: #fce8d0;
+}
+
+.cuentas-pagar-table td {
+  padding: 0.85rem 1.25rem;
+  color: #1a1a2e;
+  border-right: 1px solid #e8e0d5;
+  border-bottom: 1px solid #e8e0d5;
+}
+
+.cuentas-pagar-table td:last-child {
+  border-right: none;
+}
+
+.cuentas-pagar-empty {
+  text-align: center;
+  padding: 3rem !important;
+  color: #a8a29e;
+  font-style: italic;
+}
+
+.cuentas-pagar-acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-editar {
+  padding: 0.4rem 0.6rem;
+  background: #e8e0d5;
+  border: none;
+  border-radius: 6px;
+  color: #1a1a2e;
+  cursor: pointer;
+}
+
+.btn-editar:hover:not(:disabled) {
+  background: #f0ede8;
+  color: #ef761f;
+}
+
+.btn-eliminar {
+  padding: 0.4rem 0.6rem;
+  background: #e8e0d5;
+  border: none;
+  border-radius: 6px;
+  color: #1a1a2e;
+  cursor: pointer;
+}
+
+.btn-eliminar:hover:not(:disabled) {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.estado-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.estado-badge.pendiente {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.estado-badge.pagada {
+  background: #d4edda;
+  color: #155724;
+}
+
+.estado-badge.vencida {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(26, 26, 46, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 700px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(26, 26, 46, 0.3);
+  padding: 1.5rem;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.modal-header h2 {
+  margin: 0;
+  color: #1a1a2e;
+  font-size: 1.5rem;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+}
+
+.modal-close:hover:not(:disabled) {
+  background: #f0ede8;
+  color: #1a1a2e;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.form-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #1a1a2e;
+}
+
+.form-group label svg {
+  color: #ef761f;
+}
+
+.form-input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #1a1a2e;
+  background: white;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: #ef761f;
+  box-shadow: 0 0 0 3px rgba(239, 118, 31, 0.15);
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e8e0d5;
+}
+
+.btn-cancelar {
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #1a1a2e;
+  cursor: pointer;
+}
+
+.btn-cancelar:hover:not(:disabled) {
+  background: #f0ede8;
+}
+
+.btn-guardar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.5rem;
+  background: #ef761f;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+}
+
+.btn-guardar:hover:not(:disabled) {
+  background: #f0883a;
+}
+
+.btn-guardar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+  .cuentas-pagar-table-wrapper {
+    overflow-x: auto;
+  }
+  .cuentas-pagar-table {
+    min-width: 900px;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

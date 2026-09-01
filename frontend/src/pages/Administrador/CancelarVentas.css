@@ -1,0 +1,314 @@
+.cancelar-ventas-container {
+  padding: 2rem;
+  background: #f5f0e8;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.cancelar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cancelar-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.cancelar-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.cancelar-btn-reload {
+  padding: 0.6rem 1.5rem;
+  background: #1a1a2e;
+  color: white;
+  border: none;
+  border-radius: 100px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelar-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(26, 26, 46, 0.08);
+  margin-bottom: 1rem;
+}
+
+.cancelar-label {
+  display: block;
+  font-weight: 600;
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
+}
+
+.cancelar-input-wrapper {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cancelar-input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+  min-width: 250px;
+}
+
+.cancelar-input:focus {
+  border-color: #ef761f;
+}
+
+.cancelar-btn {
+  padding: 0.75rem 1.5rem;
+  background: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cancelar-btn:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.cancelar-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Buscador */
+.cancelar-buscador {
+  margin-bottom: 1rem;
+}
+
+.cancelar-buscador-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.cancelar-input-buscar {
+  width: 100%;
+  padding: 0.65rem 2.5rem 0.65rem 1rem;
+  border: 1.5px solid #e8e0d5;
+  border-radius: 10px;
+  background: white;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.cancelar-input-buscar:focus {
+  border-color: #ef761f;
+}
+
+.cancelar-buscador-limpiar {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #999;
+  cursor: pointer;
+}
+
+/* Resumen */
+.cancelar-resumen {
+  display: flex;
+  gap: 2rem;
+  padding: 0.75rem 1.25rem;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  border: 1px solid #e8e0d5;
+  flex-wrap: wrap;
+}
+
+.cancelar-resumen-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cancelar-resumen-label {
+  font-size: 0.875rem;
+  color: #666;
+}
+
+.cancelar-resumen-valor {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* Tabla (Misma estructura naranja que Cargar Ventas) */
+.cancelar-table-wrapper {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(26, 26, 46, 0.08);
+  overflow: hidden;
+  border: 1px solid rgba(239, 118, 31, 0.15);
+}
+
+.cancelar-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cancelar-table thead {
+  background: #ef761f;
+}
+
+.cancelar-table th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.cancelar-table th:last-child {
+  border-right: none;
+}
+
+.cancelar-table tbody tr:nth-child(even) {
+  background-color: #ffffff;
+}
+
+.cancelar-table tbody tr:nth-child(odd) {
+  background-color: #fdf6ed;
+}
+
+.cancelar-table tbody tr:hover {
+  background-color: #fce8d0;
+}
+
+.cancelar-table td {
+  padding: 0.85rem 1.25rem;
+  color: #1a1a2e;
+  border-right: 1px solid #e8e0d5;
+  border-bottom: 1px solid #e8e0d5;
+}
+
+.cancelar-table td:last-child {
+  border-right: none;
+}
+
+.cancelar-empty {
+  text-align: center;
+  padding: 3rem !important;
+  color: #a8a29e;
+  font-style: italic;
+}
+
+/* ============================================
+   📐 CONTROL DE ANCHOS DE COLUMNAS (AGREGADO)
+   ============================================ */
+/* Columna 1: Factura */
+.cancelar-table th:nth-child(1),
+.cancelar-table td:nth-child(1) {
+  min-width: 130px;
+}
+
+/* Columna 2: Fecha */
+.cancelar-table th:nth-child(2),
+.cancelar-table td:nth-child(2) {
+  min-width: 100px;
+}
+
+/* Columna 3: Producto (Ocupa más espacio) */
+.cancelar-table th:nth-child(3),
+.cancelar-table td:nth-child(3) {
+  min-width: 180px;
+  max-width: 300px;
+  white-space: normal;
+  word-wrap: break-word;
+}
+
+/* Columna 4: Cantidad */
+.cancelar-table th:nth-child(4),
+.cancelar-table td:nth-child(4) {
+  width: 70px;
+  min-width: 60px;
+  max-width: 80px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Columna 5: Valor */
+.cancelar-table th:nth-child(5),
+.cancelar-table td:nth-child(5) {
+  min-width: 80px;
+}
+
+/* Columna 6: Mesa */
+.cancelar-table th:nth-child(6),
+.cancelar-table td:nth-child(6) {
+  min-width: 80px;
+}
+
+/* Columna 7: Forma de pago */
+.cancelar-table th:nth-child(7),
+.cancelar-table td:nth-child(7) {
+  min-width: 110px;
+}
+
+/* ✅ Columna 8: Usuario (MÁS PEQUEÑA Y CON SALTO DE LÍNEA) */
+.cancelar-table th:nth-child(8),
+.cancelar-table td:nth-child(8) {
+  min-width: 90px;
+  max-width: 120px;
+  white-space: normal;
+  word-wrap: break-word;
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+/* Columna 9: Cancelada */
+.cancelar-table th:nth-child(9),
+.cancelar-table td:nth-child(9) {
+  min-width: 80px;
+  text-align: center;
+}
+
+/* Badge */
+.ventas-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 100px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.ventas-badge.cancelada {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+@media (max-width: 768px) {
+  .cancelar-input-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cancelar-table-wrapper {
+    overflow-x: auto;
+  }
+  .cancelar-table {
+    min-width: 800px;
+  }
+}

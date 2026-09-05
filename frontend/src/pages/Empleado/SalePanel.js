@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import Swal from "sweetalert2";
-import { Printer, Save, PlayCircle, X, ChevronDown, Plus, Eye } from "lucide-react";
+import { Save, PlayCircle, X, ChevronDown, Plus, Eye } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { fetchMenu, saveSale } from "../../api";
 import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";

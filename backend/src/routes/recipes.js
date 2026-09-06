@@ -33,8 +33,13 @@ router.get("/:menuItemId", requireAuth, requireAdmin, async (req, res) => {
     );
 
     // Texto legible, ej: "Café: 12 gr - Leche: 250 ml"
+    // OJO: row.quantity viene de Postgres como STRING (ej "1.000") por ser NUMERIC/DECIMAL.
+    // Lo convertimos a Number para que no salgan ceros decimales de sobra.
     const recipeText = rows
-      .map((r) => `${r.name}: ${r.quantity}${r.unit_of_measure ? " " + r.unit_of_measure : ""}`)
+      .map((r) => {
+        const qty = Number(r.quantity);
+        return `${r.name}: ${qty}${r.unit_of_measure ? " " + r.unit_of_measure : ""}`;
+      })
       .join(" - ");
 
     res.json({ items: rows, recipeText });
@@ -149,8 +154,12 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
 
       const entry = byProduct.get(row.id);
 
+      // OJO: row.quantity viene de Postgres como STRING (ej "13.000") por ser NUMERIC/DECIMAL.
+      // Convertimos a Number para el texto legible (quita los ceros de sobra: "1.000" -> 1).
+      const qty = Number(row.quantity);
+
       entry.parts.push(
-        `${row.ingredient_name}: ${row.quantity}${
+        `${row.ingredient_name}: ${qty}${
           row.unit_of_measure ? " " + row.unit_of_measure : ""
         }`
       );
@@ -159,7 +168,7 @@ router.get("/", requireAuth, requireAdmin, async (req, res) => {
       entry.raw.push({
         type: row.inventory_item_id ? "inventory" : "component",
         refId: row.inventory_item_id ?? row.component_item_id,
-        quantity: Number(row.quantity),
+        quantity: qty,
       });
     }
 

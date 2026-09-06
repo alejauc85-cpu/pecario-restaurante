@@ -10,7 +10,7 @@ import {
   createMenuItem,
 } from "../api";
 import Swal from "sweetalert2";
-import { Plus, Edit, Trash2, X, Save, ChefHat, List } from "lucide-react";
+import { Plus, Edit, Trash2, X, Save, ChefHat, List, Eye, Package, Layers } from "lucide-react";
 import "./MenuView.css";
 import "./Formulaview.css";
 
@@ -30,6 +30,10 @@ export default function FormulaView() {
   const [recipeRows, setRecipeRows] = useState([]);
   const [loadingModal, setLoadingModal] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Modal de VER fórmula (solo lectura)
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewingRecipe, setViewingRecipe] = useState(null);
 
   // Modal de productos sin fórmula
   const [showMissingFormulaModal, setShowMissingFormulaModal] = useState(false);
@@ -90,6 +94,14 @@ export default function FormulaView() {
       setStatus("error");
     }
   }
+
+  // ============================================================
+  // ABRIR MODAL: VER FÓRMULA (solo lectura)
+  // ============================================================
+  const openViewRecipe = (recipe) => {
+    setViewingRecipe(recipe);
+    setShowViewModal(true);
+  };
 
   // ============================================================
   // ABRIR MODAL: CREAR / EDITAR RECETA DE UN PRODUCTO
@@ -500,7 +512,6 @@ export default function FormulaView() {
           <thead>
             <tr>
               <th>Producto</th>
-              <th>JSON de la fórmula</th>
               <th>Fórmula legible</th>
               <th>Acciones</th>
             </tr>
@@ -509,26 +520,29 @@ export default function FormulaView() {
           <tbody>
             {recipes.length === 0 ? (
               <tr>
-                <td colSpan="4">Todavía no hay ninguna receta cargada.</td>
+                <td colSpan="3">Todavía no hay ninguna receta cargada.</td>
               </tr>
             ) : (
               recipes.map((r) => (
                 <tr key={r.id}>
                   <td>{r.name}</td>
-                  <td className="formula-json-cell">
-                    <pre className="formula-json">
-                      {JSON.stringify(r.raw || [], null, 2)}
-                    </pre>
-                  </td>
                   <td className="formula-cell">
-                    <span 
-                      className="formula-text" 
+                    <span
+                      className="formula-text"
                       title={r.recipeText || "Sin fórmula"}
                     >
                       {r.recipeText || "-"}
                     </span>
                   </td>
                   <td className="actions-cell">
+                    <button
+                      className="btn-view-icon"
+                      onClick={() => openViewRecipe(r)}
+                      title="Ver fórmula completa"
+                    >
+                      <Eye size={16} />
+                    </button>
+
                     <button
                       className="btn-edit-icon"
                       onClick={() => openEditor(r.id)}
@@ -551,6 +565,73 @@ export default function FormulaView() {
           </tbody>
         </table>
       </div>
+
+      {/* ======================================================
+          MODAL: VER FÓRMULA (solo lectura, reemplaza el JSON crudo)
+          ====================================================== */}
+      {showViewModal && viewingRecipe && (
+        <div className="modal-overlay" onClick={() => setShowViewModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                <ChefHat size={18} />
+                {viewingRecipe.name}
+              </h2>
+              <button className="modal-close" onClick={() => setShowViewModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              {(viewingRecipe.raw || []).length === 0 ? (
+                <p className="formula-empty-state">Este producto no tiene ingredientes cargados.</p>
+              ) : (
+                <div className="formula-box-list">
+                  {(viewingRecipe.raw || []).map((item, i, arr) => {
+                    // recipeText viene en el mismo orden que raw, ej "Nombre: 2 ml"
+                    const parts = (viewingRecipe.recipeText || "").split(" - ");
+                    const [name, qtyText] = (parts[i] || "").split(": ");
+                    return (
+                      <React.Fragment key={i}>
+                        <div className="formula-box-item">
+                          <span
+                            className={`formula-type-badge ${
+                              item.type === "inventory" ? "tipo-insumo" : "tipo-componente"
+                            }`}
+                          >
+                            {item.type === "inventory" ? <Package size={12} /> : <Layers size={12} />}
+                            {item.type === "inventory" ? "Insumo" : "Producto"}
+                          </span>
+                          <span className="formula-box-name">{name || "—"}</span>
+                          <span className="formula-box-qty">{qtyText || "—"}</span>
+                        </div>
+                        {i < arr.length - 1 && <div className="formula-box-plus">+</div>}
+                      </React.Fragment>
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="form-actions">
+                <button
+                  type="button"
+                  className="btn-save"
+                  onClick={() => {
+                    setShowViewModal(false);
+                    openEditor(viewingRecipe.id);
+                  }}
+                >
+                  <Edit size={16} />
+                  Editar esta fórmula
+                </button>
+                <button type="button" className="btn-cancel" onClick={() => setShowViewModal(false)}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ======================================================
           MODAL: PRODUCTOS SIN FÓRMULA
@@ -819,8 +900,8 @@ export default function FormulaView() {
                       {newProductPreviewText ? (
                         newProductPreviewText.split(" - ").map((part, i) => (
                           <React.Fragment key={i}>
-                            {i > 0 && <span className="recipe-separator">{" - "}</span>}
-                            <span>{part}</span>
+                            {i > 0 && <span className="recipe-separator">+</span>}
+                            <span className="recipe-chip">{part}</span>
                           </React.Fragment>
                         ))
                       ) : (
@@ -978,8 +1059,8 @@ export default function FormulaView() {
                       {previewText ? (
                         previewText.split(" - ").map((part, i) => (
                           <React.Fragment key={i}>
-                            {i > 0 && <span className="recipe-separator">{" - "}</span>}
-                            <span>{part}</span>
+                            {i > 0 && <span className="recipe-separator">+</span>}
+                            <span className="recipe-chip">{part}</span>
                           </React.Fragment>
                         ))
                       ) : (
@@ -1018,4 +1099,4 @@ export default function FormulaView() {
       )}
     </div>
   );
-}           
+}

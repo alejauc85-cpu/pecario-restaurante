@@ -1,9 +1,9 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom"; // ← quita BrowserRouter de aquí
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import IngresarPedidos from "./pages/Administrador/IngresarPedidos.jsx"; // ✅ NUEVO
+import IngresarPedidos from "./pages/Administrador/IngresarPedidos.jsx";
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
@@ -18,36 +18,33 @@ function PublicRoute({ children }) {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route
-            path="/login"
-            element={
-              <PublicRoute>
-                <Login />
-              </PublicRoute>
-            }
-          />
-          <Route
-            path="/dashboard"
-            element={
-              <PrivateRoute>
-                <Dashboard />
-              </PrivateRoute>
-            }
-          />
-          {/* ✅ NUEVA RUTA PARA INGRESAR PEDIDOS */}
-          <Route
-            path="/ingresar-pedidos"
-            element={
-              <PrivateRoute>
-                <IngresarPedidos />
-              </PrivateRoute>
-            }
-          />
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </BrowserRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/dashboard"
+          element={
+            <PrivateRoute>
+              <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/ingresar-pedidos"
+          element={
+            <PrivateRoute>
+              <IngresarPedidos />
+            </PrivateRoute>
+          }
+        />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
     </AuthProvider>
   );
 }

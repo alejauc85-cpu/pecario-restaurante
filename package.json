@@ -1,24 +1,17 @@
 {
-  "name": "brasa",
-  "private": true,
-  "version": "1.0.0",
-  "workspaces": [
-    "frontend",
-    "backend"
-  ],
-  "scripts": {
-    "start": "concurrently -n backend,frontend -c blue,green \"npm start -w backend\" \"npm start -w frontend\"",
-    "dev": "npm start",
-    "seed": "npm run seed -w backend"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2"
-  },
-  "dependencies": {
-    "@react-pdf/renderer": "^4.5.1",
-    "buffer": "^6.0.3",
-    "lucide-react": "^1.25.0",
-    "recharts": "^3.10.1",
-    "sweetalert2": "^11.26.25"
-  }
+"name": "brasa",
+"private": true,
+"version": "1.0.0",
+"workspaces": [
+"frontend",
+"backend"
+],
+"scripts": {
+"start": "concurrently -n backend,frontend -c blue,green \"npm start -w backend\" \"npm start -w frontend\"",
+"dev": "npm start",
+"seed": "npm run seed -w backend"
+},
+"devDependencies": {
+"concurrently": "^8.2.2"
+}
 }

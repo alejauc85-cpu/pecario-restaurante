@@ -1,9 +1,7 @@
-```js
 const { Pool } = require("pg");
 
 let databaseUrl = process.env.DATABASE_URL || "";
 
-// Limpiar espacios y posibles comillas que hayan quedado en Railway
 databaseUrl = databaseUrl.trim().replace(/^["']|["']$/g, "");
 
 console.log("DATABASE_URL existe:", !!databaseUrl);
@@ -21,11 +19,6 @@ try {
   console.log("======================================");
 } catch (err) {
   console.error("❌ DATABASE_URL inválida:", err.message);
-  console.error(
-    "Inicio de DATABASE_URL:",
-    databaseUrl.substring(0, 40)
-  );
-
   throw err;
 }
 
@@ -36,8 +29,6 @@ const isLocal =
 const pool = new Pool({
   connectionString: databaseUrl,
   ssl: isLocal ? false : { rejectUnauthorized: false },
-
-  // Evita que una variable PGHOST externa cambie el host
   host: parsedUrl.hostname,
 });
 
@@ -46,4 +37,3 @@ pool.on("error", (err) => {
 });
 
 module.exports = pool;
-```

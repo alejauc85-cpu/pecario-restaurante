@@ -1,4 +1,5 @@
 require("dotenv").config();
+console.log("DB host configurado:", (process.env.DATABASE_URL || "").split("@")[1]);
 const express = require("express");
 const cors = require("cors");
 

@@ -1,12 +1,28 @@
 const { Pool } = require("pg");
 
-// Railway (y la mayoría de proveedores cloud de Postgres) requieren SSL,
-// pero con un certificado que node no valida por defecto → se desactiva
-// la verificación estricta. En tu propia máquina (localhost) no hace falta SSL.
-const isLocal = /localhost|127\.0\.0\.1/.test(process.env.DATABASE_URL || "");
+const databaseUrl = process.env.DATABASE_URL;
+
+if (!databaseUrl) {
+  console.error("❌ DATABASE_URL no está definida");
+} else {
+  try {
+    const dbUrl = new URL(databaseUrl);
+
+    console.log("========== DATABASE ==========");
+    console.log("DB host:", dbUrl.hostname);
+    console.log("DB port:", dbUrl.port);
+    console.log("DB database:", dbUrl.pathname);
+    console.log("DB user:", dbUrl.username);
+    console.log("==============================");
+  } catch (err) {
+    console.error("❌ DATABASE_URL inválida:", err.message);
+  }
+}
+
+const isLocal = /localhost|127\.0\.0\.1/.test(databaseUrl || "");
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: databaseUrl,
   ssl: isLocal ? false : { rejectUnauthorized: false },
 });
 

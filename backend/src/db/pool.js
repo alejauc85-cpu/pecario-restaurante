@@ -1,29 +1,49 @@
+```js
 const { Pool } = require("pg");
 
-const databaseUrl = process.env.DATABASE_URL;
+let databaseUrl = process.env.DATABASE_URL || "";
 
-if (!databaseUrl) {
-  console.error("❌ DATABASE_URL no está definida");
-} else {
-  try {
-    const dbUrl = new URL(databaseUrl);
+// Limpiar espacios y posibles comillas que hayan quedado en Railway
+databaseUrl = databaseUrl.trim().replace(/^["']|["']$/g, "");
 
-    console.log("========== DATABASE ==========");
-    console.log("DB host:", dbUrl.hostname);
-    console.log("DB port:", dbUrl.port);
-    console.log("DB database:", dbUrl.pathname);
-    console.log("DB user:", dbUrl.username);
-    console.log("==============================");
-  } catch (err) {
-    console.error("❌ DATABASE_URL inválida:", err.message);
-  }
+console.log("DATABASE_URL existe:", !!databaseUrl);
+
+let parsedUrl;
+
+try {
+  parsedUrl = new URL(databaseUrl);
+
+  console.log("========== CONFIGURACIÓN DB ==========");
+  console.log("DB host:", parsedUrl.hostname);
+  console.log("DB port:", parsedUrl.port || "5432");
+  console.log("DB database:", parsedUrl.pathname);
+  console.log("DB user:", parsedUrl.username);
+  console.log("======================================");
+} catch (err) {
+  console.error("❌ DATABASE_URL inválida:", err.message);
+  console.error(
+    "Inicio de DATABASE_URL:",
+    databaseUrl.substring(0, 40)
+  );
+
+  throw err;
 }
 
-const isLocal = /localhost|127\.0\.0\.1/.test(databaseUrl || "");
+const isLocal =
+  parsedUrl.hostname === "localhost" ||
+  parsedUrl.hostname === "127.0.0.1";
 
 const pool = new Pool({
   connectionString: databaseUrl,
   ssl: isLocal ? false : { rejectUnauthorized: false },
+
+  // Evita que una variable PGHOST externa cambie el host
+  host: parsedUrl.hostname,
+});
+
+pool.on("error", (err) => {
+  console.error("❌ Error inesperado en PostgreSQL:", err);
 });
 
 module.exports = pool;
+```

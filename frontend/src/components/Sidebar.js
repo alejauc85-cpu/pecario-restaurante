@@ -16,7 +16,8 @@ import {
   LogOut,
   Circle,
   Clock, // ← NUEVO: para Horarios (comentado por ahora)
-  ChefHat, // ✅ NUEVO: para Fórmulas/Recetas
+  ChefHat,
+  Store,// ✅ NUEVO: para Fórmulas/Recetas
 } from "lucide-react";
 import { useAuth, ROLE_LABELS } from "../context/AuthContext";
 import { NAV_BY_ROLE } from "../data/navigation";
@@ -72,6 +73,7 @@ const ICONS = {
   caja: Wallet,
   mesas: Table2,
   "menu-empleado": UtensilsCrossed,
+  "ventas-en-local-grupo": Store,
 };
 
 // ============================================

@@ -51,7 +51,7 @@ export default function MenuView() {
     price: "",
     pricePlatforms: "",
     unitOfMeasure: "",
-    requiresRecipe: true, // Nuevo campo
+    requiresRecipe: true,
   });
 
   const [editing, setEditing] = useState(false);
@@ -169,7 +169,7 @@ export default function MenuView() {
         pricePlatforms: form.pricePlatforms || null,
         categoryId: activeCategory?.id || categories[0]?.id,
         unitOfMeasure: form.unitOfMeasure || null,
-        requiresRecipe: form.requiresRecipe, // Incluir el nuevo campo
+        requiresRecipe: form.requiresRecipe,
       };
 
       if (editing) {
@@ -408,7 +408,7 @@ export default function MenuView() {
   }
 
   // ============================================================
-  // VISTA EMPLEADO (NO cambia - sigue igual)
+  // VISTA EMPLEADO (MODIFICADA)
   // ============================================================
 
   if (user?.role === ROLES.EMPLEADO) {
@@ -454,15 +454,9 @@ export default function MenuView() {
                       <h2>{item.name}</h2>
                     </div>
 
-                    <div className="menu-price-box">
-                      <span className="menu-price-label">Precio</span>
-                      <span className="menu-card-price">
-                        {currency.format(Number(item.price) || 0)}
-                      </span>
-                    </div>
-
+                    {/* PRECIO PLATAFORMA RENOMBRADO COMO "PRECIO" */}
                     <div className="menu-platform-box">
-                      <span className="menu-price-label">Plataformas</span>
+                      <span className="menu-price-label">Precio</span>
                       <span className="menu-platform-price">
                         {item.price_platforms != null
                           ? currency.format(Number(item.price_platforms) || 0)
@@ -497,7 +491,7 @@ export default function MenuView() {
   }
 
   // ============================================================
-  // VISTA ADMINISTRADOR (con columna requiresRecipe)
+  // VISTA ADMINISTRADOR (sin cambios - se mantiene igual)
   // ============================================================
 
   const totalProducts = allProducts.length;

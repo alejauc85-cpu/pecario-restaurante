@@ -370,3 +370,36 @@
     grid-template-columns: 1fr;
   }
 }
+/* ============================================
+   🔥 NUEVO: agregar esto a tu CuentasPagar.css
+   (si ya tienes .btn-crear como referencia de estilo,
+   puedes omitir esto y solo copiar sus mismas propiedades
+   cambiando el color de fondo)
+   ============================================ */
+
+.btn-exportar-excel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.6rem 1.2rem;
+  background: #16a34a;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btn-exportar-excel:hover:not(:disabled) {
+  background: #15803d;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+}
+
+.btn-exportar-excel:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

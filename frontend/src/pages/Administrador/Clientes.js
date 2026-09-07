@@ -116,7 +116,24 @@ export default function Clientes() {
       setLoading(true);
       const token = getToken();
       const data = await fetchClientesList(token);
-      setClientes(data);
+
+      // 🔧 FIX: normalizamos por si el backend devuelve snake_case
+      // (nombre_completo, tipo_documento) en vez de camelCase.
+      // Esto explica por qué Correo/Teléfono/Celular sí cargaban
+      // (son una sola palabra, coinciden en ambos formatos) y
+      // Nombre Completo / Tipo Documento no.
+      console.log("Datos crudos de clientes (revisar formato):", data);
+
+      const normalizados = (data || []).map((c) => ({
+        ...c,
+        nombreCompleto: c.nombreCompleto ?? c.nombre_completo ?? "",
+        tipoDocumento: c.tipoDocumento ?? c.tipo_documento ?? "",
+        correo: c.correo ?? c.email ?? "",
+        telefono: c.telefono ?? c.phone ?? "",
+        celular: c.celular ?? c.cellphone ?? c.movil ?? "",
+      }));
+
+      setClientes(normalizados);
     } catch (error) {
       console.error("Error al cargar clientes:", error);
       Swal.fire({
@@ -355,7 +372,7 @@ export default function Clientes() {
             ) : (
               paginatedData.map((cliente) => (
                 <tr key={cliente.id}>
-                  <td>{cliente.nombreCompleto}</td>
+                  <td>{cliente.nombreCompleto || "-"}</td>
                   <td>{cliente.tipoDocumento || "-"}</td>
                   <td>{cliente.correo || "-"}</td>
                   <td>{cliente.telefono || "-"}</td>

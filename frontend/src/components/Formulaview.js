@@ -471,9 +471,9 @@ export default function FormulaView() {
         Fórmulas / Recetas
       </h1>
       <p className="section-subtitle" style={{ marginBottom: "1rem" }}>
-        Aquí ves cómo se prepara cada producto, ya traducido a texto — nunca
+        {/* Aquí ves cómo se prepara cada producto, ya traducido a texto — nunca
         vas a ver código JSON. Solo tú (admin) puedes ver y editar esta
-        pantalla.
+        pantalla. */}
       </p>
 
       {/* ======================================================
@@ -587,28 +587,16 @@ export default function FormulaView() {
                 <p className="formula-empty-state">Este producto no tiene ingredientes cargados.</p>
               ) : (
                 <div className="formula-box-list">
-                  {(viewingRecipe.raw || []).map((item, i, arr) => {
-                    // recipeText viene en el mismo orden que raw, ej "Nombre: 2 ml"
-                    const parts = (viewingRecipe.recipeText || "").split(" - ");
-                    const [name, qtyText] = (parts[i] || "").split(": ");
-                    return (
-                      <React.Fragment key={i}>
-                        <div className="formula-box-item">
-                          <span
-                            className={`formula-type-badge ${
-                              item.type === "inventory" ? "tipo-insumo" : "tipo-componente"
-                            }`}
-                          >
-                            {item.type === "inventory" ? <Package size={12} /> : <Layers size={12} />}
-                            {item.type === "inventory" ? "Insumo" : "Producto"}
-                          </span>
-                          <span className="formula-box-name">{name || "—"}</span>
-                          <span className="formula-box-qty">{qtyText || "—"}</span>
-                        </div>
-                        {i < arr.length - 1 && <div className="formula-box-plus">+</div>}
-                      </React.Fragment>
-                    );
-                  })}
+                  {(viewingRecipe.raw || []).map((item, i, arr) => (
+                    <React.Fragment key={i}>
+                      <div className="formula-box-item">
+                        <pre className="formula-json-box">
+                          {JSON.stringify(item)}
+                        </pre>
+                      </div>
+                      {i < arr.length - 1 && <div className="formula-box-plus">+</div>}
+                    </React.Fragment>
+                  ))}
                 </div>
               )}
 
@@ -764,7 +752,7 @@ export default function FormulaView() {
                 </select>
               </div>
 
-              <div className="form-group">
+              {/* <div className="form-group">
                 <label>URL de imagen (opcional)</label>
                 <input
                   type="text"
@@ -775,7 +763,7 @@ export default function FormulaView() {
                   placeholder="https://ejemplo.com/imagen.jpg"
                   disabled={savingNewProduct}
                 />
-              </div>
+              </div> */}
 
               <div className="form-group checkbox-group">
                 <label className="checkbox-label">

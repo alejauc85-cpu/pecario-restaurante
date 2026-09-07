@@ -9,8 +9,11 @@ import {
   FileText,
   Filter,
   ChevronDown,
+  FileSpreadsheet,
+  Download,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 import { fetchAllSales } from "../../api";
 import Paginador from "../../pages/Administrador/Paginador";
 import "./CargarVentas.css";
@@ -39,6 +42,27 @@ const getItemPrice = (item) => {
   return isNaN(num) ? 0 : num;
 };
 
+// ✅ Parseo robusto del JSON de items (misma lógica que usa la tabla)
+const parseItemsVenta = (venta) => {
+  if (!venta.items) return [];
+  try {
+    const parsed =
+      typeof venta.items === "string" ? JSON.parse(venta.items) : venta.items;
+    return Array.isArray(parsed) ? parsed : [parsed];
+  } catch (e) {
+    console.error("Error parseando items:", e);
+    return [];
+  }
+};
+
+const getMesaLabel = (venta) =>
+  venta.table_number === 1 ||
+  venta.table_number === 2 ||
+  venta.table_number === 3 ||
+  venta.table_number === 4
+    ? `Mesa ${venta.table_number}`
+    : "Caja";
+
 export default function CargarVentas() {
   const [ventas, setVentas] = useState([]);
   const [ventasFiltradas, setVentasFiltradas] = useState([]);
@@ -57,6 +81,14 @@ export default function CargarVentas() {
     fechaInicio: "",
     fechaFin: "",
   });
+
+  // ============================================
+  // 🔥 NUEVO: MODAL DE EXPORTAR A EXCEL POR FECHAS
+  // ============================================
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [fechaExportInicio, setFechaExportInicio] = useState("");
+  const [fechaExportFin, setFechaExportFin] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const getToken = () => {
     try {
@@ -167,6 +199,135 @@ export default function CargarVentas() {
     }));
   };
 
+  // ============================================
+  // 🔥 NUEVO: EXPORTAR A EXCEL POR RANGO DE FECHAS
+  //
+  // Usa la MISMA estructura de la tabla: una fila por
+  // producto, con Factura/Fecha/Mesa/Forma de pago/Usuario/
+  // Cancelada repetidos en cada fila (Excel no tiene rowSpan).
+  // ============================================
+  const handleExportarExcel = async () => {
+    if (!fechaExportInicio || !fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Fechas requeridas",
+        text: "Selecciona la fecha inicio y la fecha fin.",
+      });
+    }
+
+    if (fechaExportInicio > fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Rango inválido",
+        text: "La fecha inicio debe ser anterior o igual a la fecha fin.",
+      });
+    }
+
+    try {
+      setExporting(true);
+      const token = getToken();
+
+      // Traemos todas las ventas del rango directamente vía filtros de la API
+      const data = await fetchAllSales(token, {
+        fechaInicio: fechaExportInicio,
+        fechaFin: fechaExportFin,
+      });
+
+      const ventasRango = (data || []).filter((v) => v.cancelada !== true);
+
+      if (ventasRango.length === 0) {
+        setExporting(false);
+        return Swal.fire({
+          icon: "info",
+          title: "Sin datos",
+          text: "No hay ventas registradas en ese rango de fechas.",
+        });
+      }
+
+      // ---------- Construir filas igual que la tabla (1 fila por producto) ----------
+      const filas = [];
+
+      ventasRango.forEach((venta) => {
+        let fechaMostrar = "--";
+        if (venta.created_at) {
+          const fechaObj = new Date(venta.created_at);
+          if (!isNaN(fechaObj.getTime())) {
+            fechaMostrar = fechaObj.toLocaleDateString();
+          }
+        }
+
+        const itemsVenta = parseItemsVenta(venta);
+        const mesaLabel = getMesaLabel(venta);
+
+        if (itemsVenta.length === 0) {
+          filas.push({
+            Factura: venta.numero_factura || "--",
+            Fecha: fechaMostrar,
+            Producto: "--",
+            Cantidad: "--",
+            Valor: Number(venta.total || 0),
+            Mesa: mesaLabel,
+            "Forma de pago": venta.forma_pago || "--",
+            Usuario: venta.created_by || "--",
+            Cancelada: venta.cancelada === true ? "SÍ" : "NO",
+          });
+          return;
+        }
+
+        itemsVenta.forEach((item) => {
+          filas.push({
+            Factura: venta.numero_factura || "--",
+            Fecha: fechaMostrar,
+            Producto: getItemName(item),
+            Cantidad: getItemQty(item),
+            Valor: getItemPrice(item),
+            Mesa: mesaLabel,
+            "Forma de pago": venta.forma_pago || "--",
+            Usuario: venta.created_by || "--",
+            Cancelada: venta.cancelada === true ? "SÍ" : "NO",
+          });
+        });
+      });
+
+      // ---------- Armar el libro de Excel (una sola hoja, mismas columnas de la tabla) ----------
+      const wb = XLSX.utils.book_new();
+
+      const worksheet = XLSX.utils.json_to_sheet(filas, {
+        header: [
+          "Factura",
+          "Fecha",
+          "Producto",
+          "Cantidad",
+          "Valor",
+          "Mesa",
+          "Forma de pago",
+          "Usuario",
+          "Cancelada",
+        ],
+      });
+
+      XLSX.utils.book_append_sheet(wb, worksheet, "Ventas");
+
+      const nombreArchivo =
+        fechaExportInicio === fechaExportFin
+          ? `Ventas_${fechaExportInicio}.xlsx`
+          : `Ventas_${fechaExportInicio}_a_${fechaExportFin}.xlsx`;
+
+      XLSX.writeFile(wb, nombreArchivo);
+
+      setShowExportModal(false);
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo generar el archivo de Excel.",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const paginatedData = getPaginatedData();
 
   const totalVentas = ventasFiltradas.length;
@@ -185,6 +346,21 @@ export default function CargarVentas() {
             <User size={18} />
             <span>{usuario}</span>
           </div>
+
+          {/* 🔥 NUEVO: BOTÓN EXPORTAR A EXCEL */}
+          <button
+            className="btn-exportar-excel"
+            onClick={() => {
+              setFechaExportInicio(filtros.fechaInicio || "");
+              setFechaExportFin(filtros.fechaFin || "");
+              setShowExportModal(true);
+            }}
+            disabled={loading}
+          >
+            <FileSpreadsheet size={18} />
+            Exportar a Excel
+          </button>
+
           <button
             className="btn-cargar"
             onClick={cargarVentas}
@@ -477,6 +653,79 @@ export default function CargarVentas() {
           onPageChange={setCurrentPage}
         />
       </div>
+
+      {/* ============================================
+          🔥 NUEVO: MODAL DE EXPORTAR A EXCEL POR FECHAS
+      ============================================ */}
+      {showExportModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => !exporting && setShowExportModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                <FileSpreadsheet size={18} style={{ marginRight: 6, verticalAlign: "middle" }} />
+                Exportar a Excel
+              </h2>
+              <button
+                className="modal-close"
+                onClick={() => setShowExportModal(false)}
+                disabled={exporting}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p style={{ fontSize: "0.85rem", color: "#666", marginTop: 0 }}>
+                Selecciona el rango de fechas que quieres incluir en el reporte.
+              </p>
+
+              <div className="form-group">
+                <label>Fecha inicio</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportInicio}
+                  onChange={(e) => setFechaExportInicio(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Fecha fin</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportFin}
+                  onChange={(e) => setFechaExportFin(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancelar"
+                onClick={() => setShowExportModal(false)}
+                disabled={exporting}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn-guardar"
+                onClick={handleExportarExcel}
+                disabled={exporting}
+              >
+                <Download size={16} />
+                {exporting ? "Generando..." : "Descargar Excel"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

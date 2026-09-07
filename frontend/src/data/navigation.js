@@ -77,13 +77,13 @@ export const NAV_BY_ROLE = {
     // ============================================
     // 📊 REPORTES
     // ============================================
-    {
-      id: "reportes-grupo",
-      label: "Reportes",
-      children: [
-        { id: "reportes-generales", label: "Reportes generales" },
-      ],
-    },
+    // {
+    //   id: "reportes-grupo",
+    //   label: "Reportes",
+    //   children: [
+    //     { id: "reportes-generales", label: "Reportes generales" },
+    //   ],
+    // },
   ],
 
   // ============================================

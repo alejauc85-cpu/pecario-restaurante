@@ -11,8 +11,11 @@ import {
   CreditCard,
   Hash,
   DollarSign,
+  FileSpreadsheet,
+  Download,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 import {
   fetchCuentasPagar,
   createCuentaPagar,
@@ -57,6 +60,14 @@ export default function CuentasPagar() {
     tipoCuenta: "",
     usuario: "",
   });
+
+  // ============================================
+  // 🔥 NUEVO: MODAL DE EXPORTAR A EXCEL POR FECHAS
+  // ============================================
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [fechaExportInicio, setFechaExportInicio] = useState("");
+  const [fechaExportFin, setFechaExportFin] = useState("");
+  const [exporting, setExporting] = useState(false);
 
   const getToken = () => {
     try {
@@ -273,6 +284,102 @@ export default function CuentasPagar() {
     }
   };
 
+  // ============================================
+  // 🔥 NUEVO: EXPORTAR A EXCEL POR RANGO DE FECHAS
+  //
+  // Usa fecha_ingreso para filtrar el rango, y genera
+  // el Excel con exactamente las mismas columnas de la tabla.
+  // ============================================
+  const handleExportarExcel = () => {
+    if (!fechaExportInicio || !fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Fechas requeridas",
+        text: "Selecciona la fecha inicio y la fecha fin.",
+      });
+    }
+
+    if (fechaExportInicio > fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Rango inválido",
+        text: "La fecha inicio debe ser anterior o igual a la fecha fin.",
+      });
+    }
+
+    try {
+      setExporting(true);
+
+      const cuentasRango = cuentas.filter((c) => {
+        if (!c.fecha_ingreso) return false;
+        const f = c.fecha_ingreso.split("T")[0];
+        return f >= fechaExportInicio && f <= fechaExportFin;
+      });
+
+      if (cuentasRango.length === 0) {
+        setExporting(false);
+        return Swal.fire({
+          icon: "info",
+          title: "Sin datos",
+          text: "No hay cuentas por pagar con fecha de ingreso en ese rango.",
+        });
+      }
+
+      // ---------- Filas con las MISMAS columnas de la tabla ----------
+      const filas = cuentasRango.map((c) => ({
+        Descripción: c.descripcion || "-",
+        "Fecha Ingreso": c.fecha_ingreso
+          ? new Date(c.fecha_ingreso).toLocaleDateString()
+          : "-",
+        "Fecha Pago": c.fecha_pago
+          ? new Date(c.fecha_pago).toLocaleDateString()
+          : "-",
+        Valor: parseFloat(c.valor) || 0,
+        Estado: c.estado || "Pendiente",
+        Factura: c.factura || "-",
+        "Cuenta Nro.": c.cuenta_nro || "-",
+        "Tipo Cuenta": c.tipo_cuenta || "-",
+        Usuario: c.usuario || "-",
+      }));
+
+      const wb = XLSX.utils.book_new();
+
+      const worksheet = XLSX.utils.json_to_sheet(filas, {
+        header: [
+          "Descripción",
+          "Fecha Ingreso",
+          "Fecha Pago",
+          "Valor",
+          "Estado",
+          "Factura",
+          "Cuenta Nro.",
+          "Tipo Cuenta",
+          "Usuario",
+        ],
+      });
+
+      XLSX.utils.book_append_sheet(wb, worksheet, "Cuentas por pagar");
+
+      const nombreArchivo =
+        fechaExportInicio === fechaExportFin
+          ? `CuentasPorPagar_${fechaExportInicio}.xlsx`
+          : `CuentasPorPagar_${fechaExportInicio}_a_${fechaExportFin}.xlsx`;
+
+      XLSX.writeFile(wb, nombreArchivo);
+
+      setShowExportModal(false);
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo generar el archivo de Excel.",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const paginatedData = getPaginatedData();
 
   return (
@@ -287,6 +394,21 @@ export default function CuentasPagar() {
             <User size={18} />
             <span>{usuario}</span>
           </div>
+
+          {/* 🔥 NUEVO: BOTÓN EXPORTAR A EXCEL */}
+          <button
+            className="btn-exportar-excel"
+            onClick={() => {
+              setFechaExportInicio("");
+              setFechaExportFin("");
+              setShowExportModal(true);
+            }}
+            disabled={loading}
+          >
+            <FileSpreadsheet size={18} />
+            Exportar a Excel
+          </button>
+
           <button className="btn-crear" onClick={handleCrear} disabled={loading}>
             <Plus size={18} />
             Crear cuenta
@@ -525,6 +647,79 @@ export default function CuentasPagar() {
               <button className="btn-guardar" onClick={handleGuardar} disabled={loading}>
                 <Save size={16} />
                 {loading ? "Guardando..." : "Guardar cuenta"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================
+          🔥 NUEVO: MODAL DE EXPORTAR A EXCEL POR FECHAS
+      ============================================ */}
+      {showExportModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => !exporting && setShowExportModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                <FileSpreadsheet size={18} style={{ marginRight: 6, verticalAlign: "middle" }} />
+                Exportar a Excel
+              </h2>
+              <button
+                className="modal-close"
+                onClick={() => setShowExportModal(false)}
+                disabled={exporting}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p style={{ fontSize: "0.85rem", color: "#666", marginTop: 0 }}>
+                Selecciona el rango de <strong>fecha de ingreso</strong> que quieres incluir en el reporte.
+              </p>
+
+              <div className="form-group">
+                <label><Calendar size={14} /> Fecha inicio</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportInicio}
+                  onChange={(e) => setFechaExportInicio(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+
+              <div className="form-group">
+                <label><Calendar size={14} /> Fecha fin</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportFin}
+                  onChange={(e) => setFechaExportFin(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancelar"
+                onClick={() => setShowExportModal(false)}
+                disabled={exporting}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn-guardar"
+                onClick={handleExportarExcel}
+                disabled={exporting}
+              >
+                <Download size={16} />
+                {exporting ? "Generando..." : "Descargar Excel"}
               </button>
             </div>
           </div>

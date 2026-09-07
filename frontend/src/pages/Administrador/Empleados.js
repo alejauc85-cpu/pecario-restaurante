@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import {
   Plus, Edit, Trash2, X, Save, User, Calendar, Phone, MapPin, CreditCard, Building, Briefcase,
-  AlertCircle, Search, ChevronDown, Eye
+  AlertCircle, Search, ChevronDown, Eye, FileSpreadsheet, Download
 } from "lucide-react";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 import {
   fetchEmpleados, createEmpleado, updateEmpleado, deleteEmpleado,
   fetchVacacionesHistorial, createVacacion, deleteVacacion
@@ -29,6 +30,14 @@ export default function Empleados() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // ============================================
+  // 🔥 ESTADO PARA EXPORTAR CON MODAL DE FECHAS
+  // ============================================
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [fechaExportInicio, setFechaExportInicio] = useState("");
+  const [fechaExportFin, setFechaExportFin] = useState("");
 
   const [formData, setFormData] = useState({
     nombre: "", cedula: "", telefono: "", direccion: "", fecha_nacimiento: "",
@@ -202,7 +211,7 @@ export default function Empleados() {
     const start = new Date(fechaInicio);
     const now = new Date();
     const diffMonths = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-    const diasAcumulados = diffMonths * 1.25; // 15 días al año / 12 meses = 1.25 días/mes
+    const diasAcumulados = diffMonths * 1.25;
     const tomados = vacacionesHistorial.reduce((sum, v) => sum + v.dias_tomados, 0);
     const pendientes = Math.max(0, diasAcumulados - tomados);
     return { acumulados: Math.round(diasAcumulados * 10) / 10, tomados, pendientes: Math.round(pendientes * 10) / 10 };
@@ -211,6 +220,141 @@ export default function Empleados() {
   const getPaginatedData = () => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return empleadosFiltrados.slice(start, start + ITEMS_PER_PAGE);
+  };
+
+  // ============================================
+  // 🔥 EXPORTAR A EXCEL CON MODAL DE FECHAS
+  // ============================================
+  const handleExportarExcel = async () => {
+    // Validar fechas
+    if (!fechaExportInicio || !fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Fechas requeridas",
+        text: "Selecciona la fecha inicio y la fecha fin.",
+        confirmButtonColor: "#1a1a2e",
+      });
+    }
+
+    if (fechaExportInicio > fechaExportFin) {
+      return Swal.fire({
+        icon: "warning",
+        title: "Rango inválido",
+        text: "La fecha inicio debe ser anterior o igual a la fecha fin.",
+        confirmButtonColor: "#1a1a2e",
+      });
+    }
+
+    // Filtrar empleados por rango de fechas (usando fecha_inicio o created_at)
+    const empleadosExportar = empleadosFiltrados.filter((e) => {
+      // Usamos fecha_inicio como referencia (o created_at si prefieres)
+      const fechaReferencia = e.created_at || e.fecha_inicio;
+      if (!fechaReferencia) return false;
+      
+      // Normalizar fechas para comparar (solo YYYY-MM-DD)
+      const fecha = new Date(fechaReferencia).toISOString().split('T')[0];
+      return fecha >= fechaExportInicio && fecha <= fechaExportFin;
+    });
+
+    if (empleadosExportar.length === 0) {
+      setExporting(false);
+      return Swal.fire({
+        icon: "info",
+        title: "Sin datos",
+        text: "No hay empleados en ese rango de fechas.",
+        confirmButtonColor: "#1a1a2e",
+      });
+    }
+
+    try {
+      setExporting(true);
+
+      const filas = empleadosExportar.map((e) => ({
+        Nombre: e.nombre || "-",
+        Cédula: e.cedula || "-",
+        Teléfono: e.telefono || "-",
+        Dirección: e.direccion || "-",
+        "Contacto Emergencia": e.contacto_emergencia || "-",
+        "Tel. Emergencia": e.telefono_emergencia || "-",
+        "Fecha Inicio": e.fecha_inicio || "-",
+        "Tipo Contrato": e.tipo_contrato || "-",
+        Correo: e.correo || "-",
+        EPS: e.eps || "-",
+      }));
+
+      const wb = XLSX.utils.book_new();
+
+      const worksheet = XLSX.utils.json_to_sheet(filas, {
+        header: [
+          "Nombre",
+          "Cédula",
+          "Teléfono",
+          "Dirección",
+          "Contacto Emergencia",
+          "Tel. Emergencia",
+          "Fecha Inicio",
+          "Tipo Contrato",
+          "Correo",
+          "EPS",
+        ],
+      });
+
+      // Ajustar ancho de columnas
+      const colWidths = [
+        { wch: 30 }, // Nombre
+        { wch: 15 }, // Cédula
+        { wch: 15 }, // Teléfono
+        { wch: 35 }, // Dirección
+        { wch: 25 }, // Contacto Emergencia
+        { wch: 20 }, // Tel. Emergencia
+        { wch: 15 }, // Fecha Inicio
+        { wch: 20 }, // Tipo Contrato
+        { wch: 30 }, // Correo
+        { wch: 20 }, // EPS
+      ];
+      worksheet['!cols'] = colWidths;
+
+      XLSX.utils.book_append_sheet(wb, worksheet, "Empleados");
+
+      // Nombre del archivo con el rango de fechas
+      const nombreArchivo =
+        fechaExportInicio === fechaExportFin
+          ? `Empleados_${fechaExportInicio}.xlsx`
+          : `Empleados_${fechaExportInicio}_a_${fechaExportFin}.xlsx`;
+
+      XLSX.writeFile(wb, nombreArchivo);
+
+      setShowExportModal(false);
+      setFechaExportInicio("");
+      setFechaExportFin("");
+
+      Swal.fire({
+        icon: "success",
+        title: "Exportación completada",
+        text: `Se exportaron ${empleadosExportar.length} empleados.`,
+        timer: 2000,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo generar el archivo de Excel.",
+        confirmButtonColor: "#1a1a2e",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
+  // Abrir modal de exportación y pre-cargar fechas si existen
+  const abrirModalExportacion = () => {
+    // Si hay fechas en los filtros, las pre-cargamos
+    // (opcional: puedes guardar estado de fechas de filtro si lo deseas)
+    setFechaExportInicio("");
+    setFechaExportFin("");
+    setShowExportModal(true);
   };
 
   const paginatedData = getPaginatedData();
@@ -224,6 +368,17 @@ export default function Empleados() {
         </div>
         <div className="empleados-header-right">
           <div className="empleados-usuario"><User size={18} /><span>{usuario}</span></div>
+
+          {/* 🔥 BOTÓN EXPORTAR A EXCEL - ABRE MODAL CON FECHAS */}
+          <button 
+            className="btn-exportar-excel" 
+            onClick={abrirModalExportacion} 
+            disabled={loading || exporting}
+          >
+            <FileSpreadsheet size={18} />
+            {exporting ? "Generando..." : "Exportar a Excel"}
+          </button>
+
           <button className="btn-crear" onClick={handleCrear} disabled={loading}><Plus size={18} /> Crear empleado</button>
         </div>
       </div>
@@ -318,21 +473,18 @@ export default function Empleados() {
               <button className="modal-close" onClick={() => setShowVacacionesModal(false)} disabled={vacacionesLoading}><X size={20} /></button>
             </div>
             <div className="modal-body">
-              {/* Formulario para registrar vacaciones */}
               <div className="vacaciones-form">
                 <div className="form-group"><label>Fecha desde</label><input type="date" value={vacacionData.fechaDesde} onChange={e => setVacacionData({ ...vacacionData, fechaDesde: e.target.value })} className="form-input" /></div>
                 <div className="form-group"><label>Fecha hasta</label><input type="date" value={vacacionData.fechaHasta} onChange={e => setVacacionData({ ...vacacionData, fechaHasta: e.target.value })} className="form-input" /></div>
                 <button className="btn-guardar-small" onClick={handleGuardarVacacion} disabled={vacacionesLoading}>Registrar vacaciones</button>
               </div>
 
-              {/* Resumen de vacaciones */}
               <div className="vacaciones-resumen">
                 <div><strong>Días acumulados:</strong> {calcularVacacionesAcumuladas(selectedEmpleado.fecha_inicio).acumulados}</div>
                 <div><strong>Días tomados:</strong> {calcularVacacionesAcumuladas(selectedEmpleado.fecha_inicio).tomados}</div>
                 <div className="pendiente"><strong>Pendientes:</strong> {calcularVacacionesAcumuladas(selectedEmpleado.fecha_inicio).pendientes}</div>
               </div>
 
-              {/* Tabla de historial */}
               <h3 className="historial-title">Historial de vacaciones</h3>
               <div className="vacaciones-table-wrapper">
                 <table className="vacaciones-table">
@@ -358,6 +510,89 @@ export default function Empleados() {
             </div>
             <div className="modal-footer">
               <button className="btn-cancelar" onClick={() => setShowVacacionesModal(false)} disabled={vacacionesLoading}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ============================================
+          🔥 MODAL DE EXPORTAR A EXCEL CON FECHAS
+          (EXACTAMENTE IGUAL QUE CargarVentas)
+      ============================================ */}
+      {showExportModal && (
+        <div
+          className="modal-overlay"
+          onClick={() => !exporting && setShowExportModal(false)}
+        >
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h2>
+                <FileSpreadsheet size={18} style={{ marginRight: 6, verticalAlign: "middle" }} />
+                Exportar a Excel
+              </h2>
+              <button
+                className="modal-close"
+                onClick={() => setShowExportModal(false)}
+                disabled={exporting}
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p style={{ fontSize: "0.85rem", color: "#666", marginTop: 0 }}>
+                Selecciona el rango de fechas para filtrar los empleados.
+                {searchTerm && <span style={{ display: "block", marginTop: 4 }}>🔍 Filtro de búsqueda activo: "{searchTerm}"</span>}
+              </p>
+
+              <div className="form-group">
+                <label>Fecha inicio</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportInicio}
+                  onChange={(e) => setFechaExportInicio(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+
+              <div className="form-group">
+                <label>Fecha fin</label>
+                <input
+                  type="date"
+                  className="form-input"
+                  value={fechaExportFin}
+                  onChange={(e) => setFechaExportFin(e.target.value)}
+                  disabled={exporting}
+                />
+              </div>
+
+              <div style={{ marginTop: 10, fontSize: "0.85rem", color: "#888" }}>
+                <strong>Total disponibles:</strong> {empleadosFiltrados.length} empleados
+              </div>
+            </div>
+
+            <div className="modal-footer">
+              <button
+                className="btn-cancelar"
+                onClick={() => {
+                  setShowExportModal(false);
+                  setFechaExportInicio("");
+                  setFechaExportFin("");
+                }}
+                disabled={exporting}
+              >
+                Cancelar
+              </button>
+
+              <button
+                className="btn-guardar"
+                onClick={handleExportarExcel}
+                disabled={exporting}
+              >
+                <Download size={16} />
+                {exporting ? "Generando..." : "Descargar Excel"}
+              </button>
             </div>
           </div>
         </div>

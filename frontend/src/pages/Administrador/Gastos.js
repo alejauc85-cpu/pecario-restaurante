@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
 import {
   Plus, Edit, Trash2, X, Save, User,
-  FileText, Calendar, CreditCard, Search, RefreshCw
+  FileText, Calendar, CreditCard, Search, RefreshCw,
+  FileSpreadsheet,
 } from "lucide-react";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 import { fetchGastos, createGasto, updateGasto, deleteGasto } from "../../api";
 import Paginador from "../../pages/Administrador/Paginador";
 import "./Gastos.css";
@@ -26,6 +28,9 @@ export default function Gastos() {
   const [formData, setFormData] = useState({
     descripcion: "", fecha: "", valor: "", formaPago: "", usuario: ""
   });
+
+  // 🔥 NUEVO: estado de exportación
+  const [exporting, setExporting] = useState(false);
 
   const getToken = () => {
     try {
@@ -165,6 +170,62 @@ export default function Gastos() {
     }
   };
 
+  // ============================================
+  // 🔥 NUEVO: EXPORTAR A EXCEL
+  //
+  // Exporta lo que YA está filtrado en pantalla (respeta
+  // el rango de fechas de "Consultar gastos" y el buscador),
+  // con las mismas columnas de la tabla.
+  // ============================================
+  const handleExportarExcel = () => {
+    if (gastosFiltrados.length === 0) {
+      return Swal.fire({
+        icon: "info",
+        title: "Sin datos",
+        text: "No hay gastos para exportar con los filtros actuales.",
+      });
+    }
+
+    try {
+      setExporting(true);
+
+      const filas = gastosFiltrados.map((g) => ({
+        Descripción: g.descripcion || "-",
+        Fecha: g.fecha ? new Date(g.fecha).toLocaleDateString() : "-",
+        Valor: parseFloat(g.valor) || 0,
+        "Forma de pago": g.forma_pago || "-",
+        Usuario: g.usuario || "-",
+      }));
+
+      const wb = XLSX.utils.book_new();
+
+      const worksheet = XLSX.utils.json_to_sheet(filas, {
+        header: ["Descripción", "Fecha", "Valor", "Forma de pago", "Usuario"],
+      });
+
+      XLSX.utils.book_append_sheet(wb, worksheet, "Gastos");
+
+      let nombreArchivo = "Gastos";
+      if (filtros.fechaInicio && filtros.fechaFin) {
+        nombreArchivo += `_${filtros.fechaInicio}_a_${filtros.fechaFin}`;
+      } else if (filtros.fechaInicio) {
+        nombreArchivo += `_desde_${filtros.fechaInicio}`;
+      }
+      nombreArchivo += ".xlsx";
+
+      XLSX.writeFile(wb, nombreArchivo);
+    } catch (error) {
+      console.error("Error al exportar Excel:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: error.message || "No se pudo generar el archivo de Excel.",
+      });
+    } finally {
+      setExporting(false);
+    }
+  };
+
   const paginatedData = getPaginatedData();
   const totalValor = gastosFiltrados.reduce((sum, g) => sum + (g.valor || 0), 0);
 
@@ -198,6 +259,16 @@ export default function Gastos() {
         </button>
         <button className="btn-refresh" onClick={() => cargarGastos(filtros)} disabled={loading}>
           <RefreshCw size={18} className={loading ? "spin" : ""} /> Recargar
+        </button>
+
+        {/* 🔥 NUEVO: BOTÓN EXPORTAR A EXCEL */}
+        <button
+          className="btn-exportar-excel"
+          onClick={handleExportarExcel}
+          disabled={loading || exporting}
+        >
+          <FileSpreadsheet size={18} />
+          {exporting ? "Generando..." : "Exportar a Excel"}
         </button>
       </div>
 

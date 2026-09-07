@@ -71,6 +71,7 @@ const ICONS = {
   // ===== EMPLEADO =====
   caja: Wallet,
   mesas: Table2,
+  "menu-empleado": UtensilsCrossed,
 };
 
 // ============================================

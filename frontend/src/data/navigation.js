@@ -7,8 +7,22 @@ export const NAV_BY_ROLE = {
     // ============================================
     { id: "home", label: "Home" },
     { id: "arqueo-caja", label: "Arqueo de caja", icon: "Wallet" },
+
+    // ============================================
+    // 🏪 VENTAS EN LOCAL (módulos del empleado)
+    // ============================================
+    {
+      id: "ventas-en-local-grupo",
+      label: "Ventas en local",
+      children: [
+        { id: "caja", label: "Caja", icon: "Wallet" },
+        { id: "mesas", label: "Mesas" },
+        // { id: "menu-empleado", label: "Menú" },
+      ],
+    },
+
     { id: "ingresar-pedidos", label: "Ingresar pedidos" },
-    
+
     {
       id: "productos-menu",
       label: "Productos del menú",
@@ -17,7 +31,7 @@ export const NAV_BY_ROLE = {
         { id: "formulas", label: "Fórmulas / Recetas" }, // ✅ NUEVA
       ],
     },
-    
+
     // { id: "horarios", label: "Horarios" },  // ← COMENTADO: Disponible si se necesita
 
     { id: "proveedores", label: "Proveedores" },
@@ -45,8 +59,8 @@ export const NAV_BY_ROLE = {
       label: "Ventas",
       children: [
         { id: "consultar-ventas", label: "Consultar ventas" },
-        { id: "cancelar-ventas", label: "Cancelar venta" }, 
-        { id: "clientes", label: "Clientes" }, 
+        { id: "cancelar-ventas", label: "Cancelar venta" },
+        { id: "clientes", label: "Clientes" },
       ],
     },
 
@@ -65,54 +79,37 @@ export const NAV_BY_ROLE = {
       ],
     },
 
-    
-
     // ============================================
     // ⚙️ SISTEMA
     // ============================================
-    // ✅ AGREGADO: Icono "Users" para Empleados
     { id: "empleados", label: "Empleados", icon: "Users" },
     // { id: "configuracion", label: "Configuración" },
-
-    // ============================================
-    // 📊 REPORTES
-    // ============================================
-    // {
-    //   id: "reportes-grupo",
-    //   label: "Reportes",
-    //   children: [
-    //     { id: "reportes-generales", label: "Reportes generales" },
-    //   ],
-    // },
   ],
 
   // ============================================
   // 👤 ROL EMPLEADO (se queda IGUAL — sin acceso a Fórmulas)
   // ============================================
- [ROLES.EMPLEADO]: [
-  {
-    id: "home",
-    label: "Home",
-    icon: "Home",
-  },
-
-  {
-    id: "caja",
-    label: "Caja",
-    icon: "Wallet",
-  },
-
-  {
-    id: "mesas",
-    label: "Mesas",
-  },
-
-  {
-    id: "menu",
-    label: "Menú",
-    icon: "UtensilsCrossed",
-  },
-],
+  [ROLES.EMPLEADO]: [
+    {
+      id: "home",
+      label: "Home",
+      icon: "Home",
+    },
+    {
+      id: "caja",
+      label: "Caja",
+      icon: "Wallet",
+    },
+    {
+      id: "mesas",
+      label: "Mesas",
+    },
+    {
+      id: "menu",
+      label: "Menú",
+      icon: "UtensilsCrossed",
+    },
+  ],
 };
 
 export function findNavLabel(items, id) {

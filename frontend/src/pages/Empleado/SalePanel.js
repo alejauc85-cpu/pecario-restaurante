@@ -3,7 +3,7 @@ import Swal from "sweetalert2";
 import { Save, PlayCircle, X, ChevronDown, Plus, Eye } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 import { fetchMenu, saveSale } from "../../api";
-import { PDFViewer, PDFDownloadLink } from "@react-pdf/renderer";
+import { PDFViewer, PDFDownloadLink, pdf } from "@react-pdf/renderer";
 import FacturaPDF from "./FacturaPDF";
 import logo from "../../assets/Recurso 17PCR-ALTA.png";
 import "./SalePanel.css";
@@ -42,6 +42,7 @@ export default function SalePanel({
   const [saving, setSaving] = useState(false);
   const [isPrinted, setIsPrinted] = useState(false);
   const [showPdfViewer, setShowPdfViewer] = useState(false);
+  const [printing, setPrinting] = useState(false);
 
   // Inicializar el pedido con los productos guardados
   const [order, setOrder] = useState(() => {
@@ -223,8 +224,30 @@ export default function SalePanel({
     formaPago === "efectivo" && valorPagadoNum > totalConPropina
       ? valorPagadoNum - totalConPropina
       : null;
-  
-  const pagoInsuficiente = formaPago === "efectivo" && valorPagadoNum > 0 && valorPagadoNum < totalConPropina;
+
+  const pagoInsuficiente =
+    formaPago === "efectivo" && valorPagadoNum > 0 && valorPagadoNum < totalConPropina;
+
+  // Construye el documento de factura con los datos actuales
+  function buildFacturaDoc() {
+    return (
+      <FacturaPDF
+        tableNumber={tableNumber}
+        items={orderLines.map(({ item, qty }) => ({
+          name: item.name,
+          price: item.price,
+          qty: qty,
+        }))}
+        subtotal={total}
+        propina={propinaTotal}
+        total={totalConPropina}
+        valorPagado={valorPagadoNum}
+        cambio={cambio}
+        formaPago={formaPago}
+        logoUrl={logo}
+      />
+    );
+  }
 
   // Función para abrir el visor PDF
   function handleOpenPdfViewer() {
@@ -249,22 +272,66 @@ export default function SalePanel({
     setShowPdfViewer(true);
   }
 
-  // Función para confirmar impresión
-  function handlePrintConfirm() {
+  // Función para confirmar impresión: genera el PDF real como blob
+  // y lo imprime desde un iframe oculto (no desde la ventana principal),
+  // así el diálogo de impresión muestra el PDF, no la página en blanco.
+  async function handlePrintConfirm() {
     setShowPdfViewer(false);
-    setIsPrinted(true);
+    setPrinting(true);
 
-    setTimeout(() => {
-      window.print();
-    }, 300);
+    try {
+      const blob = await pdf(buildFacturaDoc()).toBlob();
+      const blobUrl = URL.createObjectURL(blob);
 
-    Swal.fire({
-      icon: "success",
-      title: "Factura enviada a imprimir",
-      text: "La factura se ha enviado a la impresora. Ahora puedes guardar la venta.",
-      confirmButtonColor: "var(--color-accent)",
-      timer: 2500,
-    });
+      const iframe = document.createElement("iframe");
+      iframe.style.position = "fixed";
+      iframe.style.right = "0";
+      iframe.style.bottom = "0";
+      iframe.style.width = "0";
+      iframe.style.height = "0";
+      iframe.style.border = "0";
+      iframe.src = blobUrl;
+
+      iframe.onload = () => {
+        setTimeout(() => {
+          try {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+          } catch (e) {
+            console.error("Error al invocar print() en el iframe:", e);
+          }
+        }, 250);
+      };
+
+      document.body.appendChild(iframe);
+
+      // Limpieza: remueve el iframe y libera el blob tras un tiempo prudente
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+        URL.revokeObjectURL(blobUrl);
+      }, 20000);
+
+      setIsPrinted(true);
+
+      Swal.fire({
+        icon: "success",
+        title: "Factura enviada a imprimir",
+        text: "La factura se ha enviado a la impresora. Ahora puedes guardar la venta.",
+        confirmButtonColor: "var(--color-accent)",
+        timer: 2500,
+      });
+    } catch (err) {
+      console.error("Error generando PDF para imprimir:", err);
+      Swal.fire({
+        icon: "error",
+        title: "No se pudo generar la factura",
+        text: "Intenta de nuevo.",
+      });
+    } finally {
+      setPrinting(false);
+    }
   }
 
   function handleAbrirVenta() {
@@ -569,33 +636,6 @@ export default function SalePanel({
           </section>
 
           <section className="sale-totals">
-            {/* <div className="sale-totals-row sale-totals-editable">
-              <label htmlFor="propina">Propina personalizada</label>
-              <input
-                id="propina"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={propina}
-                onChange={(e) => setPropina(e.target.value)}
-                placeholder="0"
-              />
-            </div> */}
-
-            {/* <div className="sale-totals-row sale-totals-checkbox">
-              <label className="propina-checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={propinaPorcentaje}
-                  onChange={(e) => setPropinaPorcentaje(e.target.checked)}
-                />
-                <span>Agregar 10% de propina</span>
-                <span className="propina-checkbox-total">
-                  {total > 0 ? `(+${currency.format(total * 0.1)})` : "(+$0)"}
-                </span>
-              </label>
-            </div> */}
-
             <div className="sale-totals-row sale-totals-final">
               <span>Total + Propina</span>
               <span>{currency.format(totalConPropina)}</span>
@@ -617,7 +657,6 @@ export default function SalePanel({
               />
             </div>
 
-            {/* ✅ CAMBIO A DEVOLVER */}
             {formaPago === "efectivo" && cambio !== null && cambio >= 0 && (
               <div className="sale-cambio-container">
                 <div className="sale-cambio-box">
@@ -630,7 +669,6 @@ export default function SalePanel({
               </div>
             )}
 
-            {/* ✅ PAGO INSUFICIENTE */}
             {pagoInsuficiente && (
               <div className="sale-pago-insuficiente">
                 ⚠️ El valor pagado es insuficiente. Faltan {currency.format(totalConPropina - valorPagadoNum)}
@@ -712,21 +750,7 @@ export default function SalePanel({
 
             <div className="pdf-viewer-body">
               <PDFViewer width="100%" height="100%" style={{ border: 'none' }}>
-                <FacturaPDF
-                  tableNumber={tableNumber}
-                  items={orderLines.map(({ item, qty }) => ({
-                    name: item.name,
-                    price: item.price,
-                    qty: qty,
-                  }))}
-                  subtotal={total}
-                  propina={propinaTotal}
-                  total={totalConPropina}
-                  valorPagado={valorPagadoNum}
-                  cambio={cambio}
-                  formaPago={formaPago}
-                  logoUrl={logo}
-                />
+                {buildFacturaDoc()}
               </PDFViewer>
             </div>
 
@@ -738,23 +762,7 @@ export default function SalePanel({
                 Cancelar
               </button>
               <PDFDownloadLink
-                document={
-                  <FacturaPDF
-                    tableNumber={tableNumber}
-                    items={orderLines.map(({ item, qty }) => ({
-                      name: item.name,
-                      price: item.price,
-                      qty: qty,
-                    }))}
-                    subtotal={total}
-                    propina={propinaTotal}
-                    total={totalConPropina}
-                    valorPagado={valorPagadoNum}
-                    cambio={cambio}
-                    formaPago={formaPago}
-                    logoUrl={logo}
-                  />
-                }
+                document={buildFacturaDoc()}
                 fileName={`factura_${tableNumber || 'caja'}_${new Date().getTime()}.pdf`}
                 className="pdf-viewer-btn pdf-viewer-btn-primary"
               >
@@ -765,8 +773,9 @@ export default function SalePanel({
               <button
                 className="pdf-viewer-btn pdf-viewer-btn-primary"
                 onClick={handlePrintConfirm}
+                disabled={printing}
               >
-                🖨️ Imprimir factura
+                🖨️ {printing ? "Generando…" : "Imprimir factura"}
               </button>
             </div>
           </div>

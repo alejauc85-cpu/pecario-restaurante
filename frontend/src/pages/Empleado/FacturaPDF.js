@@ -2,120 +2,120 @@
 import React from "react";
 import { Document, Page, Text, View, StyleSheet, Image } from "@react-pdf/renderer";
 
+// Ancho para impresora térmica de 80mm (usa 136 si tu rollo es de 58mm)
+const PAGE_WIDTH = 204;
+const PAGE_HEIGHT = 1500; // alto "de sobra", el rollo es continuo
+
 const styles = StyleSheet.create({
   page: {
-    padding: 40,
-    backgroundColor: '#ffffff',
+    width: PAGE_WIDTH,
+    height: PAGE_HEIGHT,
+    padding: 10,
+    backgroundColor: "#ffffff",
+    fontSize: 8,
+    fontFamily: "Helvetica",
   },
   logoContainer: {
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  logo: {
-    width: 120,
-    height: 60,
-    objectFit: 'contain',
-  },
-  header: {
-    textAlign: 'center',
-    marginBottom: 15,
-  },
-  direccion: {
-    fontSize: 10,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 2,
-  },
-  telefono: {
-    fontSize: 10,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 5,
-  },
-  divider: {
-    borderBottom: '1px solid #ccc',
-    marginVertical: 8,
-  },
-  mesa: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    textAlign: 'center',
+    alignItems: "center",
     marginBottom: 4,
   },
+  logo: {
+    width: 70,
+    height: 35,
+    objectFit: "contain",
+  },
+  header: {
+    textAlign: "center",
+    marginBottom: 6,
+  },
+  direccion: {
+    fontSize: 7,
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 1,
+  },
+  telefono: {
+    fontSize: 7,
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 4,
+  },
+  divider: {
+    borderBottom: "1px dashed #000",
+    marginVertical: 5,
+  },
+  mesa: {
+    fontSize: 10,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 2,
+  },
   fecha: {
-    fontSize: 10,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 8,
+    fontSize: 7,
+    color: "#333",
+    textAlign: "center",
+    marginBottom: 4,
   },
-  columns: {
-    flexDirection: 'row',
-    borderBottom: '1px solid #ccc',
-    paddingBottom: 5,
-    marginBottom: 5,
-    fontSize: 10,
-    fontWeight: 'bold',
+  columnsHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 7,
+    fontWeight: "bold",
+    marginBottom: 3,
   },
-  colItem: { flex: 2 },
-  colCant: { flex: 0.8, textAlign: 'center' },
-  colPrecio: { flex: 1.2, textAlign: 'right' },
-  colTotal: { flex: 1.2, textAlign: 'right' },
-  itemRow: {
-    flexDirection: 'row',
-    paddingVertical: 4,
-    fontSize: 10,
+  itemBlock: {
+    marginBottom: 4,
   },
-  itemNombre: { flex: 2 },
-  itemCant: { flex: 0.8, textAlign: 'center' },
-  itemPrecio: { flex: 1.2, textAlign: 'right' },
-  itemTotal: { flex: 1.2, textAlign: 'right' },
+  itemNombre: {
+    fontSize: 8,
+    fontWeight: "bold",
+  },
+  itemDetalle: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    fontSize: 7,
+    marginTop: 1,
+  },
   totales: {
-    marginTop: 10,
-    borderTop: '1px solid #ccc',
-    paddingTop: 8,
+    marginTop: 6,
   },
   totalLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 3,
-    fontSize: 11,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 2,
+    fontSize: 8,
   },
   propina: {
-    color: '#059669',
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   totalFinal: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    borderTop: '2px solid #333',
-    paddingTop: 6,
-    marginTop: 4,
+    fontSize: 11,
+    fontWeight: "bold",
+    borderTop: "1px solid #000",
+    paddingTop: 4,
+    marginTop: 3,
   },
   pago: {
-    marginTop: 12,
-    fontSize: 11,
-    borderTop: '1px solid #ccc',
-    paddingTop: 10,
+    marginTop: 8,
+    fontSize: 8,
   },
   pagoLine: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 2,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 1,
   },
   footer: {
-    textAlign: 'center',
-    marginTop: 20,
-    borderTop: '1px solid #ccc',
-    paddingTop: 12,
+    textAlign: "center",
+    marginTop: 10,
   },
   footerText: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 9,
+    fontWeight: "bold",
   },
   footerSmall: {
-    fontSize: 10,
-    color: '#666',
-    marginTop: 4,
+    fontSize: 7,
+    color: "#333",
+    marginTop: 2,
   },
 });
 
@@ -131,16 +131,16 @@ export default function FacturaPDF({
   logoUrl,
 }) {
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat('es-CO', {
-      style: 'currency',
-      currency: 'COP',
+    return new Intl.NumberFormat("es-CO", {
+      style: "currency",
+      currency: "COP",
       maximumFractionDigits: 0,
-    }).format(value);
+    }).format(value || 0);
   };
 
   return (
     <Document>
-      <Page size="A4" style={styles.page}>
+      <Page size={[PAGE_WIDTH, PAGE_HEIGHT]} style={styles.page}>
         {/* Logo */}
         <View style={styles.logoContainer}>
           <Image src={logoUrl} style={styles.logo} />
@@ -151,27 +151,30 @@ export default function FacturaPDF({
           <Text style={styles.direccion}>Calle Principal #123</Text>
           <Text style={styles.telefono}>Tel: 310-555-1234</Text>
           <View style={styles.divider} />
-          <Text style={styles.mesa}>Mesa {tableNumber || 'Caja'}</Text>
+          <Text style={styles.mesa}>Mesa {tableNumber || "Caja"}</Text>
           <Text style={styles.fecha}>{new Date().toLocaleString()}</Text>
           <View style={styles.divider} />
         </View>
 
         {/* Items */}
-        <View style={styles.columns}>
-          <Text style={styles.colItem}>Producto</Text>
-          <Text style={styles.colCant}>Cant</Text>
-          <Text style={styles.colPrecio}>Precio</Text>
-          <Text style={styles.colTotal}>Total</Text>
+        <View style={styles.columnsHeader}>
+          <Text>PRODUCTO</Text>
+          <Text>TOTAL</Text>
         </View>
 
         {items.map((item, index) => (
-          <View key={index} style={styles.itemRow}>
+          <View key={index} style={styles.itemBlock}>
             <Text style={styles.itemNombre}>{item.name}</Text>
-            <Text style={styles.itemCant}>{item.qty}</Text>
-            <Text style={styles.itemPrecio}>{formatCurrency(item.price)}</Text>
-            <Text style={styles.itemTotal}>{formatCurrency(item.price * item.qty)}</Text>
+            <View style={styles.itemDetalle}>
+              <Text>
+                {item.qty} x {formatCurrency(item.price)}
+              </Text>
+              <Text>{formatCurrency(item.price * item.qty)}</Text>
+            </View>
           </View>
         ))}
+
+        <View style={styles.divider} />
 
         {/* Totales */}
         <View style={styles.totales}>
@@ -181,7 +184,7 @@ export default function FacturaPDF({
           </View>
           {propina > 0 && (
             <View style={[styles.totalLine, styles.propina]}>
-              <Text>PROPINA {propina === subtotal * 0.1 ? '10%' : ''}</Text>
+              <Text>PROPINA {propina === subtotal * 0.1 ? "10%" : ""}</Text>
               <Text>{formatCurrency(propina)}</Text>
             </View>
           )}
@@ -193,6 +196,7 @@ export default function FacturaPDF({
 
         {/* Pago */}
         <View style={styles.pago}>
+          <View style={styles.divider} />
           <View style={styles.pagoLine}>
             <Text>Forma de pago:</Text>
             <Text>{formaPago}</Text>

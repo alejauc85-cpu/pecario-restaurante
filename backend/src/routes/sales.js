@@ -4,10 +4,23 @@ const { requireAuth } = require("../middleware/auth");
 
 const router = express.Router();
 
-const VALID_PAYMENT_METHODS = ["efectivo", "transferencia", "datafono"];
+const VALID_PAYMENT_METHODS = ["efectivo", "transferencia", "datafono", "mixto"];
+
+// Tolerancia para comparar sumas de montos (evita falsos negativos por
+// redondeos de punto flotante al validar efectivo + transferencia === total pagado).
+const EPSILON = 1;
 
 router.post("/", requireAuth, async (req, res) => {
-  const { tableNumber, items, propina, total, valorPagado, formaPago } = req.body || {};
+  const {
+    tableNumber,
+    items,
+    propina,
+    total,
+    valorPagado,
+    formaPago,
+    montoEfectivo,
+    montoTransferencia,
+  } = req.body || {};
 
   if (!Array.isArray(items) || items.length === 0) {
     return res.status(400).json({ error: "La venta debe tener al menos un producto." });
@@ -20,6 +33,28 @@ router.post("/", requireAuth, async (req, res) => {
   }
   if (total == null || Number(total) <= 0) {
     return res.status(400).json({ error: "El total de la venta no es válido." });
+  }
+
+  const isMixto = formaPago === "mixto";
+  let montoEfectivoNum = null;
+  let montoTransferenciaNum = null;
+
+  if (isMixto) {
+    montoEfectivoNum = Number(montoEfectivo) || 0;
+    montoTransferenciaNum = Number(montoTransferencia) || 0;
+
+    if (montoEfectivoNum <= 0 && montoTransferenciaNum <= 0) {
+      return res.status(400).json({
+        error: "Para pago mixto debes indicar el monto en efectivo y/o en transferencia.",
+      });
+    }
+
+    const sumaMontos = montoEfectivoNum + montoTransferenciaNum;
+    if (Math.abs(sumaMontos - Number(valorPagado)) > EPSILON) {
+      return res.status(400).json({
+        error: "La suma de efectivo y transferencia no coincide con el valor pagado.",
+      });
+    }
   }
 
   const client = await pool.connect();
@@ -45,8 +80,11 @@ router.post("/", requireAuth, async (req, res) => {
 
     // 2. Insertar la venta
     const { rows } = await client.query(
-      `INSERT INTO sales (table_number, items, propina, total, valor_pagado, forma_pago, created_by, numero_factura)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO sales (
+         table_number, items, propina, total, valor_pagado, forma_pago,
+         monto_efectivo, monto_transferencia, created_by, numero_factura
+       )
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING id, table_number, total, created_at, numero_factura`,
       [
         tableNumber ?? null,
@@ -55,6 +93,8 @@ router.post("/", requireAuth, async (req, res) => {
         Number(total),
         Number(valorPagado),
         formaPago,
+        montoEfectivoNum,
+        montoTransferenciaNum,
         req.user.username,
         nuevoNumeroFactura,
       ]
@@ -112,7 +152,8 @@ router.post("/", requireAuth, async (req, res) => {
 router.get("/summary", requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT id, table_number, total, forma_pago, created_by, created_at, numero_factura
+      `SELECT id, table_number, total, forma_pago, monto_efectivo, monto_transferencia,
+              created_by, created_at, numero_factura
        FROM sales
        WHERE created_at::date = CURRENT_DATE
        ORDER BY created_at DESC`
@@ -142,6 +183,8 @@ router.get("/all", requireAuth, async (req, res) => {
         total,
         valor_pagado,
         forma_pago,
+        monto_efectivo,
+        monto_transferencia,
         created_by,
         created_at,
         numero_factura,
@@ -210,6 +253,8 @@ router.get("/canceled", requireAuth, async (req, res) => {
         items,
         total,
         forma_pago,
+        monto_efectivo,
+        monto_transferencia,
         created_by,
         created_at,
         cancelada

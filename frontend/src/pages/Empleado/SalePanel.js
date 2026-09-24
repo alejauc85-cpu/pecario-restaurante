@@ -18,6 +18,7 @@ const PAYMENT_METHODS = [
   { id: "efectivo", label: "Efectivo" },
   { id: "transferencia", label: "Transferencia" },
   { id: "datafono", label: "Datáfono" },
+  { id: "mixto", label: "Efectivo + Transferencia" },
 ];
 
 // ============================================
@@ -67,6 +68,10 @@ export default function SalePanel({
   const [propinaPorcentaje, setPropinaPorcentaje] = useState(false);
   const [valorPagado, setValorPagado] = useState("");
   const [formaPago, setFormaPago] = useState("efectivo");
+
+  // Campos específicos para pago mixto (efectivo + transferencia)
+  const [montoEfectivo, setMontoEfectivo] = useState("");
+  const [montoTransferencia, setMontoTransferencia] = useState("");
 
   const [search, setSearch] = useState("");
   const [showResults, setShowResults] = useState(false);
@@ -219,14 +224,27 @@ export default function SalePanel({
   const propinaTotal = propinaNum + propinaAutomatica;
   const totalConPropina = total + propinaTotal;
 
-  const valorPagadoNum = Number(valorPagado) || 0;
+  const isMixto = formaPago === "mixto";
+
+  const montoEfectivoNum = Number(montoEfectivo) || 0;
+  const montoTransferenciaNum = Number(montoTransferencia) || 0;
+
+  // Cuando el pago es mixto, el "valor pagado" es la suma de ambos montos.
+  // Para los demás métodos, se usa el campo único de valor pagado.
+  const valorPagadoNum = isMixto
+    ? montoEfectivoNum + montoTransferenciaNum
+    : Number(valorPagado) || 0;
+
+  // El cambio solo tiene sentido cuando hay un componente en efectivo
+  // (pago 100% en efectivo, o pago mixto con una parte en efectivo).
+  const aplicaCambio = formaPago === "efectivo" || isMixto;
   const cambio =
-    formaPago === "efectivo" && valorPagadoNum > totalConPropina
+    aplicaCambio && valorPagadoNum > totalConPropina
       ? valorPagadoNum - totalConPropina
       : null;
 
   const pagoInsuficiente =
-    formaPago === "efectivo" && valorPagadoNum > 0 && valorPagadoNum < totalConPropina;
+    aplicaCambio && valorPagadoNum > 0 && valorPagadoNum < totalConPropina;
 
   // Construye el documento de factura con los datos actuales
   function buildFacturaDoc() {
@@ -244,6 +262,8 @@ export default function SalePanel({
         valorPagado={valorPagadoNum}
         cambio={cambio}
         formaPago={formaPago}
+        montoEfectivo={isMixto ? montoEfectivoNum : null}
+        montoTransferencia={isMixto ? montoTransferenciaNum : null}
         logoUrl={logo}
       />
     );
@@ -264,7 +284,9 @@ export default function SalePanel({
       Swal.fire({
         icon: "warning",
         title: "Valor pagado requerido",
-        text: "Ingresa el valor pagado antes de generar la factura.",
+        text: isMixto
+          ? "Ingresa el monto en efectivo y/o en transferencia."
+          : "Ingresa el valor pagado antes de generar la factura.",
       });
       return;
     }
@@ -350,9 +372,16 @@ export default function SalePanel({
   function validationError() {
     if (orderLines.length === 0)
       return "Agrega al menos un producto antes de guardar.";
-    if (!valorPagadoNum || valorPagadoNum <= 0)
-      return "Ingresa el valor pagado.";
     if (!formaPago) return "Selecciona la forma de pago.";
+
+    if (isMixto) {
+      if (montoEfectivoNum <= 0 && montoTransferenciaNum <= 0) {
+        return "Ingresa el monto en efectivo y/o en transferencia.";
+      }
+    } else if (!valorPagadoNum || valorPagadoNum <= 0) {
+      return "Ingresa el valor pagado.";
+    }
+
     if (pagoInsuficiente) {
       return `El valor pagado es insuficiente. Faltan ${currency.format(totalConPropina - valorPagadoNum)}`;
     }
@@ -405,6 +434,10 @@ export default function SalePanel({
         total: totalConPropina,
         valorPagado: valorPagadoNum,
         formaPago,
+        // Solo se envían cuando el pago es mixto; en el resto de métodos
+        // van en null para que el backend pueda distinguir claramente.
+        montoEfectivo: isMixto ? montoEfectivoNum : null,
+        montoTransferencia: isMixto ? montoTransferenciaNum : null,
       };
 
       const response = await saveSale(token, saleData);
@@ -413,6 +446,8 @@ export default function SalePanel({
       setPropina(0);
       setPropinaPorcentaje(false);
       setValorPagado("");
+      setMontoEfectivo("");
+      setMontoTransferencia("");
       setFormaPago("efectivo");
       setIsPrinted(false);
 
@@ -644,20 +679,78 @@ export default function SalePanel({
 
           <section className="sale-payment">
             <div className="sale-payment-row">
-              <label htmlFor="valorPagado">Valor pagado *</label>
-              <input
-                id="valorPagado"
-                type="number"
-                min="0"
-                inputMode="numeric"
-                value={valorPagado}
-                onChange={(e) => setValorPagado(e.target.value)}
-                placeholder="$0"
-                className={cambio !== null && cambio >= 0 ? "has-change" : pagoInsuficiente ? "has-insufficient" : ""}
-              />
+              <label htmlFor="formaPago">Forma de pago *</label>
+              <select
+                id="formaPago"
+                value={formaPago}
+                onChange={(e) => {
+                  setFormaPago(e.target.value);
+                  // Al cambiar de método se limpian los campos del otro esquema
+                  // para evitar mezclar datos de un método con otro.
+                  setValorPagado("");
+                  setMontoEfectivo("");
+                  setMontoTransferencia("");
+                }}
+              >
+                {PAYMENT_METHODS.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.label}
+                  </option>
+                ))}
+              </select>
             </div>
 
-            {formaPago === "efectivo" && cambio !== null && cambio >= 0 && (
+            {!isMixto && (
+              <div className="sale-payment-row">
+                <label htmlFor="valorPagado">Valor pagado *</label>
+                <input
+                  id="valorPagado"
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  value={valorPagado}
+                  onChange={(e) => setValorPagado(e.target.value)}
+                  placeholder="$0"
+                  className={cambio !== null && cambio >= 0 ? "has-change" : pagoInsuficiente ? "has-insufficient" : ""}
+                />
+              </div>
+            )}
+
+            {isMixto && (
+              <>
+                <div className="sale-payment-row">
+                  <label htmlFor="montoEfectivo">Monto en efectivo *</label>
+                  <input
+                    id="montoEfectivo"
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    value={montoEfectivo}
+                    onChange={(e) => setMontoEfectivo(e.target.value)}
+                    placeholder="$0"
+                  />
+                </div>
+                <div className="sale-payment-row">
+                  <label htmlFor="montoTransferencia">Monto en transferencia *</label>
+                  <input
+                    id="montoTransferencia"
+                    type="number"
+                    min="0"
+                    inputMode="numeric"
+                    value={montoTransferencia}
+                    onChange={(e) => setMontoTransferencia(e.target.value)}
+                    placeholder="$0"
+                    className={cambio !== null && cambio >= 0 ? "has-change" : pagoInsuficiente ? "has-insufficient" : ""}
+                  />
+                </div>
+                <div className="sale-payment-row sale-payment-mixto-summary">
+                  <span>Total pagado (efectivo + transferencia)</span>
+                  <span>{currency.format(valorPagadoNum)}</span>
+                </div>
+              </>
+            )}
+
+            {aplicaCambio && cambio !== null && cambio >= 0 && (
               <div className="sale-cambio-container">
                 <div className="sale-cambio-box">
                   <span className="sale-cambio-label">💰 Cambio a devolver</span>
@@ -675,21 +768,6 @@ export default function SalePanel({
               </div>
             )}
 
-            <div className="sale-payment-row">
-              <label htmlFor="formaPago">Forma de pago *</label>
-              <select
-                id="formaPago"
-                value={formaPago}
-                onChange={(e) => setFormaPago(e.target.value)}
-              >
-                {PAYMENT_METHODS.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {formaPago === "transferencia" && (
               <p className="sale-payment-hint">
                 Transferencia: QR o Consignación
@@ -697,6 +775,11 @@ export default function SalePanel({
             )}
             {formaPago === "datafono" && (
               <p className="sale-payment-hint">Datáfono: BOLD</p>
+            )}
+            {isMixto && (
+              <p className="sale-payment-hint">
+                La parte de transferencia: QR o Consignación
+              </p>
             )}
           </section>
 

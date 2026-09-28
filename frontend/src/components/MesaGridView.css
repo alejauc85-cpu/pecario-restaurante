@@ -731,3 +731,77 @@
     height: 220px;
   }
 }
+
+/* ============================================
+   ZONAS DE MESAS (Externas / Internas)
+   ============================================ */
+
+.mesa-zone {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto 2rem;
+}
+
+.mesa-zone-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-ink);
+  margin: 0 0 1rem;
+  padding: 0 60px 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--color-line, #e8e0d5);
+}
+
+.mesa-zone-count {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--color-ink-faint, #8b7355);
+  background: var(--color-bg-alt, #f3f4f6);
+  padding: 3px 12px;
+  border-radius: 999px;
+}
+
+/* Ajustar el grid dentro de cada zona */
+.mesa-zone .mesa-grid-cards {
+  padding: 20px 60px 20px;
+  margin: 0 auto;
+}
+
+/* Badge de zona en el modal */
+.modal-mesa-zone {
+  font-size: 13px;
+  font-weight: 500;
+  color: #8b7355;
+  margin-left: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .mesa-zone-title {
+    padding: 0 20px 0.5rem;
+    font-size: 16px;
+  }
+  
+  .mesa-zone .mesa-grid-cards {
+    padding: 16px 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .mesa-zone-title {
+    padding: 0 14px 0.5rem;
+    font-size: 15px;
+  }
+  
+  .mesa-zone-count {
+    font-size: 11px;
+    padding: 2px 10px;
+  }
+  
+  .mesa-zone .mesa-grid-cards {
+    padding: 14px 14px 20px;
+  }
+}

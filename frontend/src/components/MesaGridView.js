@@ -32,20 +32,22 @@ const MESA_IMAGES = [
   }
 ];
 
-// Estado de las mesas (4 mesas) - Ahora con orderItems para guardar los productos
+// ✅ 6 MESAS: 4 externas + 2 internas
 const TABLES = [
   { 
     id: 1, 
     number: 1, 
+    zone: "externa",
     isOccupied: false, 
     order: null, 
-    orderItems: [], // ✅ Guarda los productos seleccionados
+    orderItems: [],
     total: 0,
     imageIndex: 0 
   },
   { 
     id: 2, 
     number: 2, 
+    zone: "externa",
     isOccupied: false, 
     order: null, 
     orderItems: [],
@@ -55,6 +57,7 @@ const TABLES = [
   { 
     id: 3, 
     number: 3, 
+    zone: "externa",
     isOccupied: false, 
     order: null, 
     orderItems: [],
@@ -64,11 +67,32 @@ const TABLES = [
   { 
     id: 4, 
     number: 4, 
+    zone: "externa",
     isOccupied: false, 
     order: null, 
     orderItems: [],
     total: 0,
     imageIndex: 3 
+  },
+  { 
+    id: 5, 
+    number: 5, 
+    zone: "interna",
+    isOccupied: false, 
+    order: null, 
+    orderItems: [],
+    total: 0,
+    imageIndex: 0 
+  },
+  { 
+    id: 6, 
+    number: 6, 
+    zone: "interna",
+    isOccupied: false, 
+    order: null, 
+    orderItems: [],
+    total: 0,
+    imageIndex: 0 
   },
 ];
 
@@ -95,7 +119,7 @@ export default function MesaGridView() {
     setModalKey(prev => prev + 1);
   };
 
-  // ✅ Actualizar el pedido de la mesa (se llama desde SalePanel)
+  // Actualizar el pedido de la mesa
   const handleUpdateOrder = (mesaId, orderItems, total) => {
     setMesas(prev =>
       prev.map(m =>
@@ -109,7 +133,6 @@ export default function MesaGridView() {
           : m
       )
     );
-    // Actualizar también la mesa seleccionada
     setSelectedTable(prev => {
       if (prev && prev.id === mesaId) {
         return { 
@@ -123,7 +146,7 @@ export default function MesaGridView() {
     });
   };
 
-  // Cerrar mesa (cuando se cierra el modal manualmente)
+  // Cerrar mesa
   const handleCloseMesa = (mesaId) => {
     setMesas(prev =>
       prev.map(m =>
@@ -135,7 +158,7 @@ export default function MesaGridView() {
     setSelectedTable(null);
   };
 
-  // ✅ Guardar venta - Cierra la mesa y vuelve a disponible
+  // Guardar venta
   const handleSaved = (mesaId) => {
     setMesas(prev =>
       prev.map(m =>
@@ -156,6 +179,45 @@ export default function MesaGridView() {
     setSelectedTable(null);
   };
 
+  // ✅ Separar mesas por zona
+  const mesasExternas = mesas.filter(m => m.zone === "externa");
+  const mesasInternas = mesas.filter(m => m.zone === "interna");
+
+  // Renderiza una tarjeta (reutilizable)
+  const renderMesaCard = (mesa) => {
+    const image = MESA_IMAGES[mesa.imageIndex];
+    const isOccupied = mesa.isOccupied;
+
+    return (
+      <button
+        key={mesa.id}
+        type="button"
+        className={`mesa-card ${isOccupied ? 'ocupada' : ''}`}
+        onClick={() => handleTableClick(mesa)}
+      >
+        <img 
+          src={image.src} 
+          alt={image.alt}
+          className="mesa-card-image"
+        />
+        <div className="mesa-card-overlay"></div>
+        <span className="mesa-card-status-badge">
+          {isOccupied ? '🔴 Ocupada' : '🟢 Disponible'}
+        </span>
+        <div className="mesa-card-header">
+          <span className="mesa-card-number">Mesa {mesa.number}</span>
+          <span className="mesa-card-name">{image.name}</span>
+        </div>
+        {isOccupied && mesa.order && (
+          <div className="mesa-card-details">
+            <span className="detail-item">📦 {mesa.orderItems?.length || 0} items</span>
+            <span className="detail-item">💰 ${(mesa.total || 0).toLocaleString()}</span>
+          </div>
+        )}
+      </button>
+    );
+  };
+
   return (
     <div className="mesa-grid-view">
       <header className="mesa-grid-view-header">
@@ -165,41 +227,31 @@ export default function MesaGridView() {
         </span>
       </header>
 
-      <div className="mesa-grid-cards">
-        {mesas.map((mesa) => {
-          const image = MESA_IMAGES[mesa.imageIndex];
-          const isOccupied = mesa.isOccupied;
+      {/* ZONA: MESAS EXTERNAS */}
+      <section className="mesa-zone">
+        <h2 className="mesa-zone-title">
+          🌿 Mesas Externas
+          <span className="mesa-zone-count">
+            {mesasExternas.filter(m => m.isOccupied).length} / {mesasExternas.length}
+          </span>
+        </h2>
+        <div className="mesa-grid-cards">
+          {mesasExternas.map(renderMesaCard)}
+        </div>
+      </section>
 
-          return (
-            <button
-              key={mesa.id}
-              type="button"
-              className={`mesa-card ${isOccupied ? 'ocupada' : ''}`}
-              onClick={() => handleTableClick(mesa)}
-            >
-              <img 
-                src={image.src} 
-                alt={image.alt}
-                className="mesa-card-image"
-              />
-              <div className="mesa-card-overlay"></div>
-              <span className="mesa-card-status-badge">
-                {isOccupied ? '🔴 Ocupada' : '🟢 Disponible'}
-              </span>
-              <div className="mesa-card-header">
-                <span className="mesa-card-number">Mesa {mesa.number}</span>
-                <span className="mesa-card-name">{image.name}</span>
-              </div>
-              {isOccupied && mesa.order && (
-                <div className="mesa-card-details">
-                  <span className="detail-item">📦 {mesa.orderItems?.length || 0} items</span>
-                  <span className="detail-item">💰 ${(mesa.total || 0).toLocaleString()}</span>
-                </div>
-              )}
-            </button>
-          );
-        })}
-      </div>
+      {/* ZONA: MESAS INTERNAS */}
+      <section className="mesa-zone">
+        <h2 className="mesa-zone-title">
+          🏠 Mesas Internas
+          <span className="mesa-zone-count">
+            {mesasInternas.filter(m => m.isOccupied).length} / {mesasInternas.length}
+          </span>
+        </h2>
+        <div className="mesa-grid-cards">
+          {mesasInternas.map(renderMesaCard)}
+        </div>
+      </section>
 
       {selectedTable && (
         <div className="mesa-modal-overlay" onClick={handleCloseModal}>
@@ -213,6 +265,9 @@ export default function MesaGridView() {
                   />
                 </span>
                 Mesa {selectedTable.number}
+                <span className="modal-mesa-zone">
+                  • {selectedTable.zone === "externa" ? "Externa" : "Interna"}
+                </span>
                 {selectedTable.isOccupied && (
                   <span className="modal-mesa-status">• Ocupada</span>
                 )}

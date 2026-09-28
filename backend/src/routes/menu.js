@@ -29,10 +29,6 @@ async function generateRecipeText(recipeCode) {
     return null;
   }
 
-  // ============================================================
-  // OBTENER IDS ÚNICOS DE LOS INGREDIENTES
-  // ============================================================
-
   const ids = [
     ...new Set(
       recipeItems
@@ -45,10 +41,6 @@ async function generateRecipeText(recipeCode) {
     return null;
   }
 
-  // ============================================================
-  // BUSCAR LOS PRODUCTOS/INGREDIENTES
-  // ============================================================
-
   const { rows } = await pool.query(
     `SELECT 
         id,
@@ -59,19 +51,11 @@ async function generateRecipeText(recipeCode) {
     [ids]
   );
 
-  // ============================================================
-  // MAPA DE PRODUCTOS POR ID
-  // ============================================================
-
   const productsMap = new Map();
 
   rows.forEach((product) => {
     productsMap.set(Number(product.id), product);
   });
-
-  // ============================================================
-  // CONSTRUIR LA RECETA
-  // ============================================================
 
   const recipeParts = [];
 
@@ -122,7 +106,233 @@ async function generateRecipeText(recipeCode) {
 }
 
 // ============================================================
+// CATEGORÍAS — LISTAR TODAS (sin items)
+// GET /api/menu/categories
+// ============================================================
+
+router.get("/categories", requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT
+          id,
+          slug,
+          label,
+          visible_roles,
+          sort_order
+       FROM menu_categories
+       ORDER BY sort_order ASC`
+    );
+
+    res.json({ categories: rows });
+  } catch (err) {
+    console.error("Error en GET /menu/categories:", err);
+    res.status(500).json({
+      error: "Error al cargar las categorías.",
+    });
+  }
+});
+
+// ============================================================
+// CATEGORÍA INDIVIDUAL CON SUS ITEMS
+// GET /api/menu/categories/:id
+// ============================================================
+
+router.get("/categories/:id", requireAuth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows: categoryRows } = await pool.query(
+      `SELECT
+          id,
+          slug,
+          label,
+          visible_roles,
+          sort_order
+       FROM menu_categories
+       WHERE id = $1`,
+      [id]
+    );
+
+    if (categoryRows.length === 0) {
+      return res.status(404).json({
+        error: "Categoría no encontrada.",
+      });
+    }
+
+    const category = categoryRows[0];
+
+    const { rows: items } = await pool.query(
+      `SELECT
+          id,
+          name,
+          price,
+          price_platforms,
+          prep,
+          note,
+          unit_of_measure,
+          recipe_code,
+          recipe
+       FROM menu_items
+       WHERE category_id = $1
+       ORDER BY sort_order ASC`,
+      [category.id]
+    );
+
+    category.items = items;
+
+    res.json(category);
+  } catch (err) {
+    console.error("Error en GET /menu/categories/:id:", err);
+    res.status(500).json({
+      error: "Error al cargar la categoría.",
+    });
+  }
+});
+
+// ============================================================
+// CREAR CATEGORÍA
+// POST /api/menu/categories
+// ============================================================
+
+router.post(
+  "/categories",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    const { slug, label, visibleRoles, sortOrder } = req.body;
+
+    if (!slug || !label) {
+      return res.status(400).json({
+        error: "Slug y label son obligatorios.",
+      });
+    }
+
+    try {
+      const { rows: maxOrder } = await pool.query(
+        `SELECT COALESCE(MAX(sort_order), 0) + 1 AS next_order
+         FROM menu_categories`
+      );
+
+      const { rows } = await pool.query(
+        `INSERT INTO menu_categories (
+            slug,
+            label,
+            visible_roles,
+            sort_order
+         )
+         VALUES ($1, $2, $3, $4)
+         RETURNING id, slug, label, visible_roles, sort_order`,
+        [
+          slug,
+          label,
+          visibleRoles || null,
+          sortOrder || maxOrder[0].next_order,
+        ]
+      );
+
+      res.status(201).json(rows[0]);
+    } catch (err) {
+      console.error("Error en POST /menu/categories:", err);
+      res.status(500).json({
+        error: "Error al crear la categoría.",
+      });
+    }
+  }
+);
+
+// ============================================================
+// ACTUALIZAR CATEGORÍA
+// PUT /api/menu/categories/:id
+// ============================================================
+
+router.put(
+  "/categories/:id",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+    const { slug, label, visibleRoles, sortOrder } = req.body;
+
+    if (!slug || !label) {
+      return res.status(400).json({
+        error: "Slug y label son obligatorios.",
+      });
+    }
+
+    try {
+      const { rows } = await pool.query(
+        `UPDATE menu_categories
+         SET
+            slug = $1,
+            label = $2,
+            visible_roles = $3,
+            sort_order = COALESCE($4, sort_order)
+         WHERE id = $5
+         RETURNING id, slug, label, visible_roles, sort_order`,
+        [slug, label, visibleRoles || null, sortOrder, id]
+      );
+
+      if (rows.length === 0) {
+        return res.status(404).json({
+          error: "Categoría no encontrada.",
+        });
+      }
+
+      res.json(rows[0]);
+    } catch (err) {
+      console.error(
+        "Error en PUT /menu/categories/:id:",
+        err
+      );
+      res.status(500).json({
+        error: "Error al actualizar la categoría.",
+      });
+    }
+  }
+);
+
+// ============================================================
+// ELIMINAR CATEGORÍA
+// DELETE /api/menu/categories/:id
+// ============================================================
+
+router.delete(
+  "/categories/:id",
+  requireAuth,
+  requireAdmin,
+  async (req, res) => {
+    const { id } = req.params;
+
+    try {
+      const { rowCount } = await pool.query(
+        `DELETE FROM menu_categories WHERE id = $1`,
+        [id]
+      );
+
+      if (rowCount === 0) {
+        return res.status(404).json({
+          error: "Categoría no encontrada.",
+        });
+      }
+
+      res.json({
+        message: "Categoría eliminada correctamente.",
+      });
+    } catch (err) {
+      console.error(
+        "Error en DELETE /menu/categories/:id:",
+        err
+      );
+      res.status(500).json({
+        error: "Error al eliminar la categoría.",
+      });
+    }
+  }
+);
+
+// ============================================================
 // OBTENER MENÚ COMPLETO
+// GET /api/menu
 // ============================================================
 
 router.get("/", requireAuth, async (req, res) => {
@@ -172,6 +382,7 @@ router.get("/", requireAuth, async (req, res) => {
 
 // ============================================================
 // CREAR ÍTEM
+// POST /api/menu/items
 // ============================================================
 
 router.post(
@@ -196,16 +407,7 @@ router.post(
     }
 
     try {
-      // ========================================================
-      // GENERAR RECETA EXCLUSIVAMENTE CON EL recipeCode
-      // DE ESTE PRODUCTO
-      // ========================================================
-
       const recipe = await generateRecipeText(recipeCode);
-
-      // ========================================================
-      // SIGUIENTE ORDEN
-      // ========================================================
 
       const { rows: maxOrder } = await pool.query(
         `SELECT 
@@ -214,10 +416,6 @@ router.post(
          WHERE category_id = $1`,
         [categoryId]
       );
-
-      // ========================================================
-      // INSERTAR
-      // ========================================================
 
       const { rows } = await pool.query(
         `INSERT INTO menu_items (
@@ -268,6 +466,7 @@ router.post(
 
 // ============================================================
 // ACTUALIZAR ÍTEM
+// PUT /api/menu/items/:id
 // ============================================================
 
 router.put(
@@ -293,15 +492,7 @@ router.put(
     }
 
     try {
-      // ========================================================
-      // REGENERAR RECETA PARA ESTE PRODUCTO
-      // ========================================================
-
       const recipe = await generateRecipeText(recipeCode);
-
-      // ========================================================
-      // ACTUALIZAR
-      // ========================================================
 
       const { rows } = await pool.query(
         `UPDATE menu_items
@@ -357,6 +548,7 @@ router.put(
 
 // ============================================================
 // ELIMINAR ÍTEM
+// DELETE /api/menu/items/:id
 // ============================================================
 
 router.delete(
@@ -397,6 +589,7 @@ router.delete(
 
 // ============================================================
 // OBTENER ÍTEM ESPECÍFICO
+// GET /api/menu/items/:id
 // ============================================================
 
 router.get(
@@ -444,6 +637,7 @@ router.get(
 
 // ============================================================
 // CONTEO DE PRODUCTOS
+// GET /api/menu/count
 // ============================================================
 
 router.get(

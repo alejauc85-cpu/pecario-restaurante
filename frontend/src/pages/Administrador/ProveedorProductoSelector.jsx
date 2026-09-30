@@ -5,7 +5,7 @@ import {
   createProveedor,
   fetchProductosProveedor,
   crearProductoParaProveedor,
-} from "../api";
+} from "../../api";
 import "./ProveedorProductoSelector.css";
 
 export default function ProveedorProductoSelector({

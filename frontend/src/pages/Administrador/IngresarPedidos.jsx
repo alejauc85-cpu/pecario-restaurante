@@ -18,7 +18,7 @@ import {
   updatePedido,
   deletePedido,
 } from "../../api";
-import ProveedorProductoSelector from "../../components/ProveedorProductoSelector";
+import ProveedorProductoSelector from "../../pages/Administrador/ProveedorProductoSelector";
 import Paginador from "../../pages/Administrador/Paginador";
 import "./IngresarPedidos.css";
 

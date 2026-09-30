@@ -33,6 +33,21 @@ const currency = new Intl.NumberFormat("es-CO", {
 
 const ITEMS_PER_PAGE = 6;
 
+// ============================================================
+// GENERADOR DE SLUG
+// ============================================================
+const generarSlug = (texto) => {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/ñ/g, "n")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+};
+
 export default function MenuView() {
   const { user, token, logout } = useAuth();
 
@@ -273,17 +288,27 @@ export default function MenuView() {
   // ============================================================
 
   const handleCatChange = (e) => {
-    setCatForm({ ...catForm, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name === "label") {
+      setCatForm({
+        ...catForm,
+        label: value,
+        slug: generarSlug(value),
+      });
+    } else {
+      setCatForm({ ...catForm, [name]: value });
+    }
   };
 
   const handleCategorySubmit = async (e) => {
     e.preventDefault();
 
-    if (!catForm.slug.trim() || !catForm.label.trim()) {
+    if (!catForm.label.trim()) {
       await Swal.fire({
         icon: "warning",
         title: "Datos incompletos",
-        text: "Slug y Label son obligatorios.",
+        text: "El nombre de la categoría es obligatorio.",
         confirmButtonText: "Entendido",
       });
       return;
@@ -292,9 +317,11 @@ export default function MenuView() {
     try {
       setLoading(true);
 
+      const slugFinal = generarSlug(catForm.label);
+
       if (catEditing) {
         await updateMenuCategory(token, catForm.id, {
-          slug: catForm.slug.trim(),
+          slug: slugFinal,
           label: catForm.label.trim(),
         });
 
@@ -306,7 +333,7 @@ export default function MenuView() {
         });
       } else {
         await createMenuCategory(token, {
-          slug: catForm.slug.trim(),
+          slug: slugFinal,
           label: catForm.label.trim(),
         });
 
@@ -408,7 +435,7 @@ export default function MenuView() {
   }
 
   // ============================================================
-  // VISTA EMPLEADO (MODIFICADA)
+  // VISTA EMPLEADO
   // ============================================================
 
   if (user?.role === ROLES.EMPLEADO) {
@@ -454,7 +481,6 @@ export default function MenuView() {
                       <h2>{item.name}</h2>
                     </div>
 
-                    {/* PRECIO PLATAFORMA RENOMBRADO COMO "PRECIO" */}
                     <div className="menu-platform-box">
                       <span className="menu-price-label">Precio</span>
                       <span className="menu-platform-price">
@@ -491,7 +517,7 @@ export default function MenuView() {
   }
 
   // ============================================================
-  // VISTA ADMINISTRADOR (sin cambios - se mantiene igual)
+  // VISTA ADMINISTRADOR
   // ============================================================
 
   const totalProducts = allProducts.length;
@@ -767,23 +793,15 @@ export default function MenuView() {
                 <form className="cat-form" onSubmit={handleCategorySubmit}>
                   <input
                     type="text"
-                    name="slug"
-                    placeholder="Slug (ej: cafeteria)"
-                    value={catForm.slug}
-                    onChange={handleCatChange}
-                    className="form-input"
-                    disabled={loading}
-                  />
-
-                  <input
-                    type="text"
                     name="label"
-                    placeholder="Label (ej: Cafetería)"
+                    placeholder="Nombre de la categoría (ej: Cafetería)"
                     value={catForm.label}
                     onChange={handleCatChange}
                     className="form-input"
                     disabled={loading}
                   />
+
+                  {/* El input de slug ya no se muestra */}
 
                   <button type="submit" className="btn-save-small" disabled={loading}>
                     <Save size={14} />
@@ -811,8 +829,7 @@ export default function MenuView() {
                 <table className="cat-table">
                   <thead>
                     <tr>
-                      <th>Slug</th>
-                      <th>Label</th>
+                      <th>Nombre</th>
                       <th>Acciones</th>
                     </tr>
                   </thead>
@@ -820,12 +837,11 @@ export default function MenuView() {
                   <tbody>
                     {categories.length === 0 ? (
                       <tr>
-                        <td colSpan="3">No hay categorías creadas.</td>
+                        <td colSpan="2">No hay categorías creadas.</td>
                       </tr>
                     ) : (
                       paginatedCategories.map((cat) => (
                         <tr key={cat.id}>
-                          <td>{cat.slug}</td>
                           <td>{cat.label}</td>
                           <td className="actions-cell">
                             <button

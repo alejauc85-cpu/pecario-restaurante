@@ -213,6 +213,12 @@ router.post(
          FROM menu_categories`
       );
 
+      // Valor por defecto para visible_roles si no se envía
+      const rolesFinales =
+        Array.isArray(visibleRoles) && visibleRoles.length > 0
+          ? visibleRoles
+          : ["admin", "empleado"];
+
       const { rows } = await pool.query(
         `INSERT INTO menu_categories (
             slug,
@@ -220,12 +226,12 @@ router.post(
             visible_roles,
             sort_order
          )
-         VALUES ($1, $2, $3, $4)
+         VALUES ($1, $2, $3::text[], $4)
          RETURNING id, slug, label, visible_roles, sort_order`,
         [
           slug,
           label,
-          visibleRoles || null,
+          rolesFinales,
           sortOrder || maxOrder[0].next_order,
         ]
       );
@@ -260,16 +266,25 @@ router.put(
     }
 
     try {
+      // Si no se envía visibleRoles, conservar el valor actual de la BD
       const { rows } = await pool.query(
         `UPDATE menu_categories
          SET
             slug = $1,
             label = $2,
-            visible_roles = $3,
+            visible_roles = COALESCE($3::text[], visible_roles),
             sort_order = COALESCE($4, sort_order)
          WHERE id = $5
          RETURNING id, slug, label, visible_roles, sort_order`,
-        [slug, label, visibleRoles || null, sortOrder, id]
+        [
+          slug,
+          label,
+          Array.isArray(visibleRoles) && visibleRoles.length > 0
+            ? visibleRoles
+            : null,
+          sortOrder,
+          id,
+        ]
       );
 
       if (rows.length === 0) {

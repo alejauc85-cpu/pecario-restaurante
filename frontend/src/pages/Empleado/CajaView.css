@@ -90,3 +90,16 @@
     font-size: 18px;
   }
 }
+
+/* Colores por forma de pago */
+.caja-stat-efectivo .caja-summary-number {
+  color: #cc638e; /* verde para efectivo */
+}
+
+.caja-stat-transferencia .caja-summary-number {
+  color: #6b9b7d; /* azul para transferencia */
+}
+
+.caja-stat-datafono .caja-summary-number {
+  color: #f5ab22; /* morado para datáfono */
+}

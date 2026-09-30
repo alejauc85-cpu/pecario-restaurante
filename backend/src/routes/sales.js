@@ -149,22 +149,59 @@ router.post("/", requireAuth, async (req, res) => {
   }
 });
 
+// ============================================
+// 📊 RESUMEN DEL DÍA CON DESGLOSE POR FORMA DE PAGO
+// ============================================
 router.get("/summary", requireAuth, async (req, res) => {
   try {
     const { rows } = await pool.query(
+      `SELECT 
+        COUNT(*) AS count,
+        COALESCE(SUM(total), 0) AS "totalAmount",
+        COALESCE(SUM(
+          CASE 
+            WHEN forma_pago = 'efectivo' THEN total
+            WHEN forma_pago = 'mixto' THEN COALESCE(monto_efectivo, 0)
+            ELSE 0
+          END
+        ), 0) AS "totalEfectivo",
+        COALESCE(SUM(
+          CASE 
+            WHEN forma_pago = 'transferencia' THEN total
+            WHEN forma_pago = 'mixto' THEN COALESCE(monto_transferencia, 0)
+            ELSE 0
+          END
+        ), 0) AS "totalTransferencia",
+        COALESCE(SUM(
+          CASE 
+            WHEN forma_pago = 'datafono' THEN total
+            ELSE 0
+          END
+        ), 0) AS "totalDatafono"
+       FROM sales
+       WHERE created_at::date = CURRENT_DATE
+         AND cancelada = false`
+    );
+
+    // Ventas detalladas del día
+    const { rows: sales } = await pool.query(
       `SELECT id, table_number, total, forma_pago, monto_efectivo, monto_transferencia,
               created_by, created_at, numero_factura
        FROM sales
        WHERE created_at::date = CURRENT_DATE
+         AND cancelada = false
        ORDER BY created_at DESC`
     );
 
-    const totalAmount = rows.reduce((sum, r) => sum + r.total, 0);
+    const summary = rows[0] || {};
 
     res.json({
-      count: rows.length,
-      totalAmount,
-      sales: rows,
+      count: Number(summary.count) || 0,
+      totalAmount: Number(summary.totalAmount) || 0,
+      totalEfectivo: Number(summary.totalEfectivo) || 0,
+      totalTransferencia: Number(summary.totalTransferencia) || 0,
+      totalDatafono: Number(summary.totalDatafono) || 0,
+      sales,
     });
   } catch (err) {
     console.error("Error en GET /sales/summary:", err);
@@ -291,4 +328,5 @@ router.get("/weekly", requireAuth, async (req, res) => {
     res.status(500).json({ error: "Error al cargar ventas semanales." });
   }
 });
+
 module.exports = router;

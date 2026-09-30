@@ -22,7 +22,7 @@ export default function CajaView() {
       console.warn("No hay token disponible");
       return;
     }
-    
+
     try {
       const data = await fetchSalesSummary(token);
       setSummary(data);
@@ -38,8 +38,7 @@ export default function CajaView() {
   }, [loadSummary]);
 
   const handleSaved = () => {
-    // Recargar el resumen después de guardar una venta
-    setRefreshKey(prev => prev + 1);
+    setRefreshKey((prev) => prev + 1);
     loadSummary();
   };
 
@@ -47,7 +46,11 @@ export default function CajaView() {
     <div className="caja-view">
       <div className="caja-summary">
         <h2 className="caja-summary-title">💵 Ventas de hoy</h2>
-        {error && <p className="caja-summary-error">No se pudo cargar el resumen.</p>}
+
+        {error && (
+          <p className="caja-summary-error">No se pudo cargar el resumen.</p>
+        )}
+
         {!error && summary && (
           <div className="caja-summary-stats">
             <div className="caja-stat">
@@ -56,12 +59,39 @@ export default function CajaView() {
                 {summary.count === 1 ? "venta" : "ventas"}
               </span>
             </div>
+
             <div className="caja-stat">
-              <span className="caja-summary-number">{currency.format(summary.totalAmount || 0)}</span>
+              <span className="caja-summary-number">
+                {currency.format(summary.totalAmount || 0)}
+              </span>
               <span className="caja-summary-label">total del día</span>
             </div>
+
+            <div className="caja-stat caja-stat-efectivo">
+              <span className="caja-summary-number">
+                {currency.format(summary.totalEfectivo || 0)}
+              </span>
+              <span className="caja-summary-label">💵 efectivo</span>
+            </div>
+
+            <div className="caja-stat caja-stat-transferencia">
+              <span className="caja-summary-number">
+                {currency.format(summary.totalTransferencia || 0)}
+              </span>
+              <span className="caja-summary-label">🏦 transferencia</span>
+            </div>
+
+            {summary.totalDatafono > 0 && (
+              <div className="caja-stat caja-stat-datafono">
+                <span className="caja-summary-number">
+                  {currency.format(summary.totalDatafono || 0)}
+                </span>
+                <span className="caja-summary-label">💳 datáfono</span>
+              </div>
+            )}
           </div>
         )}
+
         {!error && !summary && (
           <p className="caja-summary-loading">Cargando resumen...</p>
         )}
@@ -71,7 +101,7 @@ export default function CajaView() {
         key={refreshKey}
         title="Caja"
         isTable={false}
-        mode="cashier" // ✅ Importante: modo caja
+        mode="cashier"
         onSaved={handleSaved}
       />
     </div>

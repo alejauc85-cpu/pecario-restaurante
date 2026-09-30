@@ -56,7 +56,7 @@ export default function CajaView() {
             <div className="caja-stat">
               <span className="caja-summary-number">{summary.count || 0}</span>
               <span className="caja-summary-label">
-                {summary.count === 1 ? "venta" : "ventas"}
+                {summary.count === 1 ? "venta" : "Ventas"}
               </span>
             </div>
 

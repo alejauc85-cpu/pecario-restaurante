@@ -54,6 +54,58 @@ router.get("/bancos", requireAuth, async (req, res) => {
 });
 
 // ============================================
+// 📊 VENTAS DE LOS ÚLTIMOS 7 DÍAS (para el gráfico)
+// ============================================
+router.get("/weekly", requireAuth, async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      `SELECT 
+        TO_CHAR(created_at, 'Dy') as day_name,
+        SUM(total) as total
+       FROM sales
+       WHERE created_at >= CURRENT_DATE - INTERVAL '6 days'
+         AND cancelada = false
+       GROUP BY TO_CHAR(created_at, 'Dy')
+       ORDER BY MIN(created_at) ASC`
+    );
+    res.json(rows);
+  } catch (err) {
+    console.error("Error en GET /sales/weekly:", err);
+    res.status(500).json({ error: "Error al cargar ventas semanales." });
+  }
+});
+
+// ============================================
+// 📥 PRODUCTOS DE UN PROVEEDOR
+// GET /api/proveedores/:id/productos
+// ============================================
+router.get("/:id/productos", requireAuth, async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const { rows } = await pool.query(
+      `SELECT
+         pp.id,
+         pp.producto_id      AS "productoId",
+         pp.codigo_proveedor AS "codigoProveedor",
+         mi.name             AS "nombre",
+         mi.price            AS "precio",
+         mi.unit_of_measure  AS "unidadMedida"
+       FROM proveedor_productos pp
+       INNER JOIN menu_items mi ON mi.id = pp.producto_id
+       WHERE pp.proveedor_id = $1
+       ORDER BY mi.name ASC`,
+      [id]
+    );
+
+    res.json(rows);
+  } catch (err) {
+    console.error("Error en GET /proveedores/:id/productos:", err);
+    res.status(500).json({ error: "Error al cargar los productos del proveedor." });
+  }
+});
+
+// ============================================
 // 📥 OBTENER UN PROVEEDOR POR ID
 // ============================================
 router.get("/:id", requireAuth, async (req, res) => {
@@ -280,24 +332,118 @@ router.delete("/:id", requireAuth, requireAdmin, async (req, res) => {
 });
 
 // ============================================
-// 📊 VENTAS DE LOS ÚLTIMOS 7 DÍAS (para el gráfico)
+// ➕ ASOCIAR UN PRODUCTO EXISTENTE A UN PROVEEDOR
+// POST /api/proveedores/:id/productos
+// Body: { productoId, codigoProveedor? }
 // ============================================
-router.get("/weekly", requireAuth, async (req, res) => {
+router.post("/:id/productos", requireAuth, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { productoId, codigoProveedor } = req.body;
+
+  if (!productoId) {
+    return res.status(400).json({ error: "productoId es obligatorio." });
+  }
+
   try {
     const { rows } = await pool.query(
-      `SELECT 
-        TO_CHAR(created_at, 'Dy') as day_name,
-        SUM(total) as total
-       FROM sales
-       WHERE created_at >= CURRENT_DATE - INTERVAL '6 days'
-         AND cancelada = false
-       GROUP BY TO_CHAR(created_at, 'Dy')
-       ORDER BY MIN(created_at) ASC`
+      `INSERT INTO proveedor_productos (proveedor_id, producto_id, codigo_proveedor)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (proveedor_id, producto_id)
+       DO UPDATE SET
+         codigo_proveedor = COALESCE(EXCLUDED.codigo_proveedor, proveedor_productos.codigo_proveedor)
+       RETURNING
+         id,
+         producto_id      AS "productoId",
+         codigo_proveedor AS "codigoProveedor"`,
+      [id, productoId, codigoProveedor || null]
     );
-    res.json(rows);
+
+    res.status(201).json(rows[0]);
   } catch (err) {
-    console.error("Error en GET /sales/weekly:", err);
-    res.status(500).json({ error: "Error al cargar ventas semanales." });
+    console.error("Error en POST /proveedores/:id/productos:", err);
+    res.status(500).json({ error: "Error al asociar el producto al proveedor." });
+  }
+});
+
+// ============================================
+// 🆕 CREAR UN PRODUCTO NUEVO Y ASOCIARLO AL PROVEEDOR
+// POST /api/proveedores/:id/productos/nuevo
+// Body: { nombre, codigoProveedor?, precio?, unidadMedida? }
+// ============================================
+router.post("/:id/productos/nuevo", requireAuth, requireAdmin, async (req, res) => {
+  const { id } = req.params;
+  const { nombre, codigoProveedor, precio, unidadMedida } = req.body;
+
+  if (!nombre) {
+    return res.status(400).json({ error: "El nombre del producto es obligatorio." });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query("BEGIN");
+
+    const { rows: provRows } = await client.query(
+      "SELECT id FROM proveedores WHERE id = $1",
+      [id]
+    );
+
+    if (provRows.length === 0) {
+      await client.query("ROLLBACK");
+      return res.status(404).json({ error: "Proveedor no encontrado." });
+    }
+
+    const { rows: existing } = await client.query(
+      "SELECT id FROM menu_items WHERE LOWER(name) = LOWER($1) LIMIT 1",
+      [nombre]
+    );
+
+    let productoId;
+
+    if (existing.length > 0) {
+      productoId = existing[0].id;
+    } else {
+      const { rows: catRows } = await client.query(
+        "SELECT id FROM menu_categories ORDER BY id ASC LIMIT 1"
+      );
+
+      if (catRows.length === 0) {
+        await client.query("ROLLBACK");
+        return res.status(400).json({
+          error: "No hay categorías en el menú. Crea una categoría primero."
+        });
+      }
+
+      const { rows: newItem } = await client.query(
+        `INSERT INTO menu_items (name, price, unit_of_measure, category_id, sort_order)
+         VALUES ($1, $2, $3, $4, 0)
+         RETURNING id`,
+        [nombre, precio || 0, unidadMedida || null, catRows[0].id]
+      );
+      productoId = newItem[0].id;
+    }
+
+    await client.query(
+      `INSERT INTO proveedor_productos (proveedor_id, producto_id, codigo_proveedor)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (proveedor_id, producto_id)
+       DO UPDATE SET codigo_proveedor = COALESCE(EXCLUDED.codigo_proveedor, proveedor_productos.codigo_proveedor)`,
+      [id, productoId, codigoProveedor || null]
+    );
+
+    await client.query("COMMIT");
+
+    res.status(201).json({
+      productoId,
+      nombre,
+      codigoProveedor: codigoProveedor || null,
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    console.error("Error en POST /proveedores/:id/productos/nuevo:", err);
+    res.status(500).json({ error: "Error al crear y asociar el producto." });
+  } finally {
+    client.release();
   }
 });
 

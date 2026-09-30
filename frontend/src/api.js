@@ -537,3 +537,30 @@ export function resetMesas(token) {
     token,
   });
 }
+
+// ============================================
+// ✅ PRODUCTOS POR PROVEEDOR
+// ============================================
+
+// Lista de productos asociados a un proveedor
+export function fetchProductosProveedor(token, proveedorId) {
+  return request(`/api/proveedores/${proveedorId}/productos`, { token });
+}
+
+// Asociar un producto existente a un proveedor
+export function asociarProductoAProveedor(token, proveedorId, data) {
+  return request(`/api/proveedores/${proveedorId}/productos`, {
+    method: "POST",
+    token,
+    body: data,
+  });
+}
+
+// Crear un producto nuevo y asociarlo al proveedor
+export function crearProductoParaProveedor(token, proveedorId, data) {
+  return request(`/api/proveedores/${proveedorId}/productos/nuevo`, {
+    method: "POST",
+    token,
+    body: data,
+  });
+}

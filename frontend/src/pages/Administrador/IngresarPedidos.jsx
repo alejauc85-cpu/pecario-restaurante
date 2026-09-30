@@ -6,20 +6,19 @@ import {
   X,
   Save,
   User,
-  Package,
-  Ruler,
   Hash,
   DollarSign,
   Tag,
+  Ruler,
 } from "lucide-react";
 import Swal from "sweetalert2";
 import {
   fetchPedidos,
-  fetchProveedores,
   createPedido,
   updatePedido,
   deletePedido,
 } from "../../api";
+import ProveedorProductoSelector from "../../components/ProveedorProductoSelector";
 import Paginador from "../../pages/Administrador/Paginador";
 import "./IngresarPedidos.css";
 
@@ -31,17 +30,17 @@ const ITEMS_PER_PAGE = 6;
 export default function IngresarPedidos() {
   const [pedidos, setPedidos] = useState([]);
   const [pedidosFiltrados, setPedidosFiltrados] = useState([]);
-  const [proveedores, setProveedores] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [usuario, setUsuario] = useState("Admin");
 
-  // ============================================
-  // 📄 ESTADO DE PAGINACIÓN
-  // ============================================
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+
+  // Datos seleccionados desde el selector
+  const [proveedorSeleccionado, setProveedorSeleccionado] = useState(null);
+  const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
   const [formData, setFormData] = useState({
     proveedorId: "",
@@ -72,7 +71,6 @@ export default function IngresarPedidos() {
   // ============================================
   useEffect(() => {
     cargarPedidos();
-    cargarProveedores();
 
     const user = JSON.parse(localStorage.getItem("user") || "{}");
     if (user.username) {
@@ -104,7 +102,6 @@ export default function IngresarPedidos() {
     setCurrentPage(1);
   };
 
-  // Obtener pedidos de la página actual
   const getPaginatedData = () => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
@@ -130,47 +127,76 @@ export default function IngresarPedidos() {
     }
   };
 
-  const cargarProveedores = async () => {
-    try {
-      const token = getToken();
-      const data = await fetchProveedores(token);
-      setProveedores(data);
-    } catch (error) {
-      console.error("Error al cargar proveedores:", error);
+  // ============================================
+  // 🎯 MANEJO DEL SELECTOR
+  // ============================================
+  const handleSelectProveedor = (prov) => {
+    setProveedorSeleccionado(prov);
+
+    if (prov) {
+      setFormData((prev) => ({
+        ...prev,
+        proveedorId: String(prov.id),
+        proveedor: prov.nombreComercial || "",
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        proveedorId: "",
+        proveedor: "",
+      }));
+    }
+
+    // Al cambiar de proveedor, limpiamos el producto
+    setProductoSeleccionado(null);
+    setFormData((prev) => ({
+      ...prev,
+      producto: "",
+      codigo: "",
+      unidadMedida: "",
+    }));
+  };
+
+  const handleSelectProducto = (prod) => {
+    setProductoSeleccionado(prod);
+
+    if (prod) {
+      setFormData((prev) => ({
+        ...prev,
+        producto: prod.nombre || "",
+        codigo: prod.codigoProveedor || "",
+        unidadMedida: prod.unidadMedida || "",
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        producto: "",
+        codigo: "",
+        unidadMedida: "",
+      }));
     }
   };
 
   // ============================================
-  // ✏️ MANEJAR CAMBIOS DEL FORMULARIO
+  // ✏️ MANEJAR CAMBIOS MANUALES
   // ============================================
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    if (name === "proveedorId") {
-      const proveedor = proveedores.find((p) => p.id === parseInt(value));
-      setFormData((prev) => ({
-        ...prev,
-        proveedorId: value,
-        proveedor: proveedor ? proveedor.nombre : "",
-      }));
-      return;
-    }
+    setFormData((prev) => {
+      const updated = { ...prev, [name]: value };
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    if (name === "precioTotal" || name === "cantidad") {
-      const total = name === "precioTotal" ? parseFloat(value) : parseFloat(formData.precioTotal);
-      const cantidad = name === "cantidad" ? parseFloat(value) : parseFloat(formData.cantidad);
-      if (total && cantidad && cantidad > 0) {
-        setFormData((prev) => ({
-          ...prev,
-          precioUnitario: (total / cantidad).toFixed(2),
-        }));
+      // Recalcular precio unitario si cambia total o cantidad
+      if (name === "precioTotal" || name === "cantidad") {
+        const total = name === "precioTotal" ? parseFloat(value) : parseFloat(prev.precioTotal);
+        const cantidad = name === "cantidad" ? parseFloat(value) : parseFloat(prev.cantidad);
+        if (total && cantidad && cantidad > 0) {
+          updated.precioUnitario = (total / cantidad).toFixed(2);
+        }
       }
-    }
+
+      return updated;
+    });
   };
 
   // ============================================
@@ -178,6 +204,8 @@ export default function IngresarPedidos() {
   // ============================================
   const handleCrear = () => {
     setEditingId(null);
+    setProveedorSeleccionado(null);
+    setProductoSeleccionado(null);
     setFormData({
       proveedorId: "",
       proveedor: "",
@@ -196,6 +224,8 @@ export default function IngresarPedidos() {
   // ============================================
   const handleEditar = (pedido) => {
     setEditingId(pedido.id);
+    setProveedorSeleccionado(null);
+    setProductoSeleccionado(null);
     setFormData({
       proveedorId: pedido.proveedorId?.toString() || "",
       proveedor: pedido.proveedor || "",
@@ -213,7 +243,16 @@ export default function IngresarPedidos() {
   // 💾 GUARDAR (CREAR O EDITAR)
   // ============================================
   const handleGuardar = async () => {
-    const { proveedorId, proveedor, producto, codigo, unidadMedida, cantidad, precioTotal, precioUnitario } = formData;
+    const {
+      proveedorId,
+      proveedor,
+      producto,
+      codigo,
+      unidadMedida,
+      cantidad,
+      precioTotal,
+      precioUnitario,
+    } = formData;
 
     if (!proveedorId || !producto || !codigo || !unidadMedida || !cantidad || !precioTotal) {
       Swal.fire({
@@ -254,6 +293,7 @@ export default function IngresarPedidos() {
         setLoading(true);
         const token = getToken();
         let response;
+
         if (editingId) {
           response = await updatePedido(token, editingId, pedidoData);
         } else {
@@ -380,7 +420,7 @@ export default function IngresarPedidos() {
             <tr>
               <th>Proveedor</th>
               <th>Producto</th>
-              <th>Id</th>
+              <th>Código</th>
               <th>Unidad de medida</th>
               <th>Cantidad</th>
               <th>Precio total</th>
@@ -403,8 +443,8 @@ export default function IngresarPedidos() {
                   <td>{pedido.codigo}</td>
                   <td>{pedido.unidadMedida}</td>
                   <td>{pedido.cantidad}</td>
-                  <td>${pedido.precioTotal.toLocaleString()}</td>
-                  <td>${pedido.precioUnitario.toLocaleString()}</td>
+                  <td>${pedido.precioTotal?.toLocaleString()}</td>
+                  <td>${pedido.precioUnitario?.toLocaleString()}</td>
                   <td>
                     <div className="pedidos-acciones">
                       <button
@@ -440,7 +480,7 @@ export default function IngresarPedidos() {
         />
       </div>
 
-      {/* MODAL (el mismo que tenías) */}
+      {/* MODAL */}
       {showModal && (
         <div className="modal-overlay" onClick={() => !loading && setShowModal(false)}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -453,75 +493,53 @@ export default function IngresarPedidos() {
 
             <div className="modal-body">
               <div className="form-grid">
-                <div className="form-group">
-                  <label>
-                    <Tag size={14} />
-                    Proveedor *
-                  </label>
-                  <select
-                    name="proveedorId"
-                    value={formData.proveedorId}
-                    onChange={handleChange}
-                    className="form-input"
-                    disabled={loading}
-                  >
-                    <option value="">Seleccionar proveedor</option>
-                    {proveedores.map((prov) => (
-                      <option key={prov.id} value={prov.id}>
-                        {prov.nombre}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="form-group">
-                  <label>
-                    <Package size={14} />
-                    Producto *
-                  </label>
-                  <input
-                    type="text"
-                    name="producto"
-                    value={formData.producto}
-                    onChange={handleChange}
-                    placeholder="Nombre del producto"
-                    className="form-input"
-                    disabled={loading}
+                {/* SELECTOR PROVEEDOR + PRODUCTO */}
+                <div className="form-group form-group-full">
+                  <ProveedorProductoSelector
+                    token={getToken()}
+                    onSelectProveedor={handleSelectProveedor}
+                    onSelectProducto={handleSelectProducto}
                   />
                 </div>
 
-                <div className="form-group">
-                  <label>
-                    <Hash size={14} />
-                    Código *
-                  </label>
-                  <input
-                    type="text"
-                    name="codigo"
-                    value={formData.codigo}
-                    onChange={handleChange}
-                    placeholder="Código del producto"
-                    className="form-input"
-                    disabled={loading}
-                  />
-                </div>
+                {/* Código y Unidad de medida (autocompletados, editables) */}
+                {productoSeleccionado && (
+                  <>
+                    <div className="form-group">
+                      <label>
+                        <Hash size={14} />
+                        Código *
+                      </label>
+                      <input
+                        type="text"
+                        name="codigo"
+                        value={formData.codigo}
+                        onChange={handleChange}
+                        placeholder="Código del producto"
+                        className="form-input"
+                        disabled={loading}
+                      />
+                    </div>
 
-                <div className="form-group">
-                  <label>
-                    <Ruler size={14} />
-                    Unidad de medida *
-                  </label>
-                  <input
-                    type="text"
-                    name="unidadMedida"
-                    value={formData.unidadMedida}
-                    onChange={handleChange}
-                    placeholder="kg, L, unidad, etc."
-                    className="form-input"
-                    disabled={loading}
-                  />
-                </div>
+                    <div className="form-group">
+                      <label>
+                        <Ruler size={14} />
+                        Unidad de medida *
+                      </label>
+                      <input
+                        type="text"
+                        name="unidadMedida"
+                        value={formData.unidadMedida}
+                        onChange={handleChange}
+                        placeholder="kg, L, unidad, etc."
+                        className="form-input"
+                        disabled={loading}
+                      />
+                    </div>
+                  </>
+                )}
 
+                {/* Cantidad y precios */}
                 <div className="form-group">
                   <label>
                     <Hash size={14} />
@@ -558,14 +576,13 @@ export default function IngresarPedidos() {
                   />
                 </div>
 
-                <div className="form-group form-group-full">
+                <div className="form-group">
                   <label>
                     <DollarSign size={14} />
                     Precio unitario (calculado)
                   </label>
                   <input
                     type="text"
-                    name="precioUnitario"
                     value={formData.precioUnitario || "0.00"}
                     className="form-input form-input-disabled"
                     disabled

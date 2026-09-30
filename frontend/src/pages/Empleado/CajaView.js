@@ -64,21 +64,21 @@ export default function CajaView() {
               <span className="caja-summary-number">
                 {currency.format(summary.totalAmount || 0)}
               </span>
-              <span className="caja-summary-label">total del día</span>
+              <span className="caja-summary-label">Total del día</span>
             </div>
 
             <div className="caja-stat caja-stat-efectivo">
               <span className="caja-summary-number">
                 {currency.format(summary.totalEfectivo || 0)}
               </span>
-              <span className="caja-summary-label">💵 efectivo</span>
+              <span className="caja-summary-label">💵 Efectivo</span>
             </div>
 
             <div className="caja-stat caja-stat-transferencia">
               <span className="caja-summary-number">
                 {currency.format(summary.totalTransferencia || 0)}
               </span>
-              <span className="caja-summary-label">🏦 transferencia</span>
+              <span className="caja-summary-label">🏦 Transferencia</span>
             </div>
 
             {summary.totalDatafono > 0 && (

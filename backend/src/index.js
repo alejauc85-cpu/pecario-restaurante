@@ -6,7 +6,7 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const menuRoutes = require("./routes/menu");
 const salesRoutes = require("./routes/sales");
-const inventoryRoutes = require("./routes/inventory"); 
+const inventoryRoutes = require("./routes/inventory");
 const pedidosRoutes = require("./routes/pedidos");
 const proveedoresRoutes = require("./routes/proveedores");
 const clientesRoutes = require("./routes/clientes");
@@ -14,7 +14,8 @@ const cuentasPagarRoutes = require("./routes/cuentasPagar");
 const gastosRoutes = require("./routes/gastos");
 const empleadosRoutes = require("./routes/empleados");
 const arqueoRoutes = require("./routes/arqueo");
-const recipesRoutes = require("./routes/recipes"); // ✅ NUEVA
+const recipesRoutes = require("./routes/recipes");
+const mesasRoutes = require("./routes/mesas"); // ✅ NUEVA
 
 const app = express();
 
@@ -36,15 +37,16 @@ app.get("/health", (_req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/menu", menuRoutes);
 app.use("/api/sales", salesRoutes);
-app.use("/api/inventory", inventoryRoutes); 
-app.use("/api/pedidos", pedidosRoutes); 
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/pedidos", pedidosRoutes);
 app.use("/api/proveedores", proveedoresRoutes);
 app.use("/api/clientes", clientesRoutes);
 app.use("/api/cuentas-pagar", cuentasPagarRoutes);
 app.use("/api/gastos", gastosRoutes);
 app.use("/api/empleados", empleadosRoutes);
 app.use("/api/arqueo", arqueoRoutes);
-app.use("/api/recipes", recipesRoutes); // ✅ NUEVA
+app.use("/api/recipes", recipesRoutes);
+app.use("/api/mesas", mesasRoutes); // ✅ NUEVA
 
 app.use((req, res) => {
   res.status(404).json({ error: "Ruta no encontrada." });

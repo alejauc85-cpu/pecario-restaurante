@@ -1,6 +1,8 @@
-import React, { useState } from "react";
-import Modal from "./Modal";
+import React, { useEffect, useState } from "react";
 import MesaOrder from "./MesaOrder";
+import { useAuth } from "../context/AuthContext";
+import { fetchMesas, updateMesa } from "../api";
+
 // Importar imágenes desde assets
 import mesa1Img from "../assets/mesa_1.png";
 import mesa2Img from "../assets/mesa_1.png";
@@ -10,166 +12,165 @@ import "./MesaGridView.css";
 
 // Imágenes para cada mesa (importadas desde assets)
 const MESA_IMAGES = [
-  {
-    src: mesa1Img,
-    alt: "Mesa 1",
-    name: "Mesa Familiar"
-  },
-  {
-    src: mesa2Img,
-    alt: "Mesa 2",
-    name: "Mesa Ejecutiva"
-  },
-  {
-    src: mesa3Img,
-    alt: "Mesa 3",
-    name: "Mesa VIP"
-  },
-  {
-    src: mesa4Img,
-    alt: "Mesa 4",
-    name: "Mesa Terraza"
-  }
-];
-
-// ✅ 6 MESAS: 4 externas + 2 internas
-const TABLES = [
-  { 
-    id: 1, 
-    number: 1, 
-    zone: "externa",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 0 
-  },
-  { 
-    id: 2, 
-    number: 2, 
-    zone: "externa",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 1 
-  },
-  { 
-    id: 3, 
-    number: 3, 
-    zone: "externa",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 2 
-  },
-  { 
-    id: 4, 
-    number: 4, 
-    zone: "externa",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 3 
-  },
-  { 
-    id: 5, 
-    number: 5, 
-    zone: "interna",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 0 
-  },
-  { 
-    id: 6, 
-    number: 6, 
-    zone: "interna",
-    isOccupied: false, 
-    order: null, 
-    orderItems: [],
-    total: 0,
-    imageIndex: 0 
-  },
+  { src: mesa1Img, alt: "Mesa 1", name: "Mesa Familiar" },
+  { src: mesa2Img, alt: "Mesa 2", name: "Mesa Ejecutiva" },
+  { src: mesa3Img, alt: "Mesa 3", name: "Mesa VIP" },
+  { src: mesa4Img, alt: "Mesa 4", name: "Mesa Terraza" },
 ];
 
 export default function MesaGridView() {
+  const { token } = useAuth();
+
+  const [mesas, setMesas] = useState([]);
   const [selectedTable, setSelectedTable] = useState(null);
-  const [mesas, setMesas] = useState(TABLES);
   const [modalKey, setModalKey] = useState(0);
+  const [status, setStatus] = useState("loading");
+  const [error, setError] = useState("");
 
-  // Abrir mesa
-  const handleOpenMesa = (mesaId) => {
-    setMesas(prev =>
-      prev.map(m =>
-        m.id === mesaId 
-          ? { ...m, isOccupied: true, order: { items: 0, total: 0 } } 
-          : m
-      )
-    );
-    setSelectedTable(prev => {
-      if (prev && prev.id === mesaId) {
-        return { ...prev, isOccupied: true, order: { items: 0, total: 0 } };
+  // ============================================================
+  // CARGAR MESAS DESDE EL BACKEND
+  // ============================================================
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      setStatus("loading");
+      setError("");
+
+      try {
+        const data = await fetchMesas(token);
+        if (cancelled) return;
+
+        const mesasConImagen = (data.mesas || []).map((mesa) => ({
+          ...mesa,
+          isOccupied: mesa.is_occupied,
+          orderItems: mesa.order_items || [],
+          total: Number(mesa.total) || 0,
+          order:
+            mesa.is_occupied
+              ? {
+                  items: (mesa.order_items || []).length,
+                  total: Number(mesa.total) || 0,
+                }
+              : null,
+          imageIndex: (mesa.number - 1) % MESA_IMAGES.length,
+        }));
+
+        setMesas(mesasConImagen);
+        setStatus("ready");
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Error cargando mesas:", err);
+        setError(err.message || "No se pudieron cargar las mesas.");
+        setStatus("error");
       }
-      return prev;
-    });
-    setModalKey(prev => prev + 1);
+    }
+
+    if (token) load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+  // ============================================================
+  // HELPERS
+  // ============================================================
+
+  const updateMesaLocal = (mesaId, changes) => {
+    setMesas((prev) =>
+      prev.map((m) => (m.id === mesaId ? { ...m, ...changes } : m))
+    );
+    setSelectedTable((prev) =>
+      prev && prev.id === mesaId ? { ...prev, ...changes } : prev
+    );
   };
 
-  // Actualizar el pedido de la mesa
-  const handleUpdateOrder = (mesaId, orderItems, total) => {
-    setMesas(prev =>
-      prev.map(m =>
-        m.id === mesaId 
-          ? { 
-              ...m, 
-              orderItems: orderItems, 
-              total: total,
-              order: { items: orderItems.length, total: total }
-            } 
-          : m
-      )
-    );
-    setSelectedTable(prev => {
-      if (prev && prev.id === mesaId) {
-        return { 
-          ...prev, 
-          orderItems: orderItems, 
-          total: total,
-          order: { items: orderItems.length, total: total }
-        };
-      }
-      return prev;
-    });
+  // ============================================================
+  // ABRIR MESA
+  // ============================================================
+
+  const handleOpenMesa = async (mesaId) => {
+    const changes = {
+      isOccupied: true,
+      orderItems: [],
+      total: 0,
+      order: { items: 0, total: 0 },
+    };
+
+    updateMesaLocal(mesaId, changes);
+    setModalKey((prev) => prev + 1);
+
+    try {
+      await updateMesa(token, mesaId, {
+        isOccupied: true,
+        orderItems: [],
+        total: 0,
+      });
+    } catch (err) {
+      console.error("Error abriendo mesa:", err);
+    }
   };
 
-  // Cerrar mesa
-  const handleCloseMesa = (mesaId) => {
-    setMesas(prev =>
-      prev.map(m =>
-        m.id === mesaId 
-          ? { ...m, isOccupied: false, order: null, orderItems: [], total: 0 } 
-          : m
-      )
-    );
+  // ============================================================
+  // ACTUALIZAR PEDIDO
+  // ============================================================
+
+  const handleUpdateOrder = async (mesaId, orderItems, total) => {
+    const changes = {
+      orderItems,
+      total,
+      order: { items: orderItems.length, total },
+    };
+
+    updateMesaLocal(mesaId, changes);
+
+    try {
+      await updateMesa(token, mesaId, { orderItems, total });
+    } catch (err) {
+      console.error("Error actualizando pedido:", err);
+    }
+  };
+
+  // ============================================================
+  // CERRAR MESA
+  // ============================================================
+
+  const handleCloseMesa = async (mesaId) => {
+    const changes = {
+      isOccupied: false,
+      orderItems: [],
+      total: 0,
+      order: null,
+    };
+
+    updateMesaLocal(mesaId, changes);
     setSelectedTable(null);
+
+    try {
+      await updateMesa(token, mesaId, {
+        isOccupied: false,
+        orderItems: [],
+        total: 0,
+      });
+    } catch (err) {
+      console.error("Error cerrando mesa:", err);
+    }
   };
 
-  // Guardar venta
-  const handleSaved = (mesaId) => {
-    setMesas(prev =>
-      prev.map(m =>
-        m.id === mesaId 
-          ? { ...m, isOccupied: false, order: null, orderItems: [], total: 0 } 
-          : m
-      )
-    );
-    setSelectedTable(null);
-    setModalKey(prev => prev + 1);
+  // ============================================================
+  // GUARDAR VENTA
+  // ============================================================
+
+  const handleSaved = async (mesaId) => {
+    await handleCloseMesa(mesaId);
+    setModalKey((prev) => prev + 1);
   };
+
+  // ============================================================
+  // CLICK EN MESA
+  // ============================================================
 
   const handleTableClick = (mesa) => {
     setSelectedTable(mesa);
@@ -179,11 +180,17 @@ export default function MesaGridView() {
     setSelectedTable(null);
   };
 
-  // ✅ Separar mesas por zona
-  const mesasExternas = mesas.filter(m => m.zone === "externa");
-  const mesasInternas = mesas.filter(m => m.zone === "interna");
+  // ============================================================
+  // SEPARAR MESAS POR ZONA
+  // ============================================================
 
-  // Renderiza una tarjeta (reutilizable)
+  const mesasExternas = mesas.filter((m) => m.zone === "externa");
+  const mesasInternas = mesas.filter((m) => m.zone === "interna");
+
+  // ============================================================
+  // RENDER DE UNA MESA
+  // ============================================================
+
   const renderMesaCard = (mesa) => {
     const image = MESA_IMAGES[mesa.imageIndex];
     const isOccupied = mesa.isOccupied;
@@ -192,17 +199,13 @@ export default function MesaGridView() {
       <button
         key={mesa.id}
         type="button"
-        className={`mesa-card ${isOccupied ? 'ocupada' : ''}`}
+        className={`mesa-card ${isOccupied ? "ocupada" : ""}`}
         onClick={() => handleTableClick(mesa)}
       >
-        <img 
-          src={image.src} 
-          alt={image.alt}
-          className="mesa-card-image"
-        />
+        <img src={image.src} alt={image.alt} className="mesa-card-image" />
         <div className="mesa-card-overlay"></div>
         <span className="mesa-card-status-badge">
-          {isOccupied ? '🔴 Ocupada' : '🟢 Disponible'}
+          {isOccupied ? "🔴 Ocupada" : "🟢 Disponible"}
         </span>
         <div className="mesa-card-header">
           <span className="mesa-card-number">Mesa {mesa.number}</span>
@@ -210,20 +213,48 @@ export default function MesaGridView() {
         </div>
         {isOccupied && mesa.order && (
           <div className="mesa-card-details">
-            <span className="detail-item">📦 {mesa.orderItems?.length || 0} items</span>
-            <span className="detail-item">💰 ${(mesa.total || 0).toLocaleString()}</span>
+            <span className="detail-item">
+              📦 {mesa.orderItems?.length || 0} items
+            </span>
+            <span className="detail-item">
+              💰 ${(mesa.total || 0).toLocaleString()}
+            </span>
           </div>
         )}
       </button>
     );
   };
 
+  // ============================================================
+  // ESTADOS DE CARGA / ERROR
+  // ============================================================
+
+  if (status === "loading") {
+    return (
+      <div className="mesa-grid-view">
+        <div className="menu-view-status">Cargando mesas…</div>
+      </div>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <div className="mesa-grid-view">
+        <div className="menu-view-status">
+          No se pudieron cargar las mesas:
+          <br />
+          {error}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mesa-grid-view">
       <header className="mesa-grid-view-header">
         <h1>Mesas</h1>
         <span className="mesa-grid-view-count">
-          {mesas.filter(m => m.isOccupied).length} ocupadas / {mesas.length} total
+          {mesas.filter((m) => m.isOccupied).length} ocupadas / {mesas.length} total
         </span>
       </header>
 
@@ -232,7 +263,7 @@ export default function MesaGridView() {
         <h2 className="mesa-zone-title">
           🌿 Mesas Externas
           <span className="mesa-zone-count">
-            {mesasExternas.filter(m => m.isOccupied).length} / {mesasExternas.length}
+            {mesasExternas.filter((m) => m.isOccupied).length} / {mesasExternas.length}
           </span>
         </h2>
         <div className="mesa-grid-cards">
@@ -245,7 +276,7 @@ export default function MesaGridView() {
         <h2 className="mesa-zone-title">
           🏠 Mesas Internas
           <span className="mesa-zone-count">
-            {mesasInternas.filter(m => m.isOccupied).length} / {mesasInternas.length}
+            {mesasInternas.filter((m) => m.isOccupied).length} / {mesasInternas.length}
           </span>
         </h2>
         <div className="mesa-grid-cards">
@@ -259,8 +290,8 @@ export default function MesaGridView() {
             <div className="mesa-modal-header">
               <h2>
                 <span className="modal-mesa-icon">
-                  <img 
-                    src={MESA_IMAGES[selectedTable.imageIndex].src} 
+                  <img
+                    src={MESA_IMAGES[selectedTable.imageIndex].src}
                     alt="mesa"
                   />
                 </span>
@@ -272,7 +303,12 @@ export default function MesaGridView() {
                   <span className="modal-mesa-status">• Ocupada</span>
                 )}
                 {!selectedTable.isOccupied && (
-                  <span className="modal-mesa-status" style={{ color: '#6b7280' }}>• Disponible</span>
+                  <span
+                    className="modal-mesa-status"
+                    style={{ color: "#6b7280" }}
+                  >
+                    • Disponible
+                  </span>
                 )}
               </h2>
               <button className="mesa-modal-close" onClick={handleCloseModal}>
@@ -280,7 +316,7 @@ export default function MesaGridView() {
               </button>
             </div>
             <div className="mesa-modal-body">
-              <MesaOrder 
+              <MesaOrder
                 key={`${selectedTable.id}-${modalKey}`}
                 tableNumber={selectedTable.number}
                 isOpen={selectedTable.isOccupied}
@@ -289,7 +325,9 @@ export default function MesaGridView() {
                 onOpenSale={() => handleOpenMesa(selectedTable.id)}
                 onCloseSale={() => handleCloseMesa(selectedTable.id)}
                 onSaved={() => handleSaved(selectedTable.id)}
-                onUpdateOrder={(items, total) => handleUpdateOrder(selectedTable.id, items, total)}
+                onUpdateOrder={(items, total) =>
+                  handleUpdateOrder(selectedTable.id, items, total)
+                }
               />
             </div>
           </div>

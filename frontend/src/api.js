@@ -48,49 +48,49 @@ export function fetchMenu(token) {
 
 // ✅ CRUD DE ÍTEMS DEL MENÚ
 export function createMenuItem(token, data) {
-  return request("/api/menu/items", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/menu/items", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 export function updateMenuItem(token, id, data) {
-  return request(`/api/menu/items/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/menu/items/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 export function deleteMenuItem(token, id) {
-  return request(`/api/menu/items/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/menu/items/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
 // ✅ CRUD DE CATEGORÍAS DEL MENÚ (NUEVAS FUNCIONES)
 export function createMenuCategory(token, data) {
-  return request("/api/menu/categories", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/menu/categories", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 export function updateMenuCategory(token, id, data) {
-  return request(`/api/menu/categories/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/menu/categories/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 export function deleteMenuCategory(token, id) {
-  return request(`/api/menu/categories/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/menu/categories/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -99,10 +99,10 @@ export function deleteMenuCategory(token, id) {
 // ============================================
 
 export function saveSale(token, saleData) {
-  return request("/api/sales", { 
-    method: "POST", 
-    token, 
-    body: saleData 
+  return request("/api/sales", {
+    method: "POST",
+    token,
+    body: saleData
   });
 }
 
@@ -119,25 +119,25 @@ export function fetchInventory(token) {
 }
 
 export function createInventoryItem(token, data) {
-  return request("/api/inventory", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/inventory", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 export function updateInventoryItem(token, id, data) {
-  return request(`/api/inventory/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/inventory/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 export function deleteInventoryItem(token, id) {
-  return request(`/api/inventory/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/inventory/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -166,27 +166,27 @@ export function fetchProveedores(token) {
 
 // Crear un nuevo pedido
 export function createPedido(token, data) {
-  return request("/api/pedidos", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/pedidos", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 // Actualizar un pedido
 export function updatePedido(token, id, data) {
-  return request(`/api/pedidos/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/pedidos/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 // Eliminar un pedido
 export function deletePedido(token, id) {
-  return request(`/api/pedidos/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/pedidos/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -211,27 +211,27 @@ export function fetchProveedorById(token, id) {
 
 // Crear un nuevo proveedor
 export function createProveedor(token, data) {
-  return request("/api/proveedores", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/proveedores", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 // Actualizar un proveedor
 export function updateProveedor(token, id, data) {
-  return request(`/api/proveedores/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/proveedores/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 // Eliminar un proveedor
 export function deleteProveedor(token, id) {
-  return request(`/api/proveedores/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/proveedores/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -244,10 +244,10 @@ export function fetchBancos(token) {
 // ============================================
 
 export function toggleInventoryStatus(token, id, status) {
-  return request(`/api/inventory/${id}/toggle-status`, { 
-    method: "PATCH", 
-    token, 
-    body: { status } 
+  return request(`/api/inventory/${id}/toggle-status`, {
+    method: "PATCH",
+    token,
+    body: { status }
   });
 }
 
@@ -257,13 +257,13 @@ export function toggleInventoryStatus(token, id, status) {
 
 export function fetchAllSales(token, filters = {}) {
   const params = new URLSearchParams();
-  
+
   if (filters.factura) params.append('factura', filters.factura);
   if (filters.mesa) params.append('mesa', filters.mesa);
   if (filters.formaPago) params.append('formaPago', filters.formaPago);
   if (filters.fechaInicio) params.append('fechaInicio', filters.fechaInicio);
   if (filters.fechaFin) params.append('fechaFin', filters.fechaFin);
-  
+
   const url = `/api/sales/all${params.toString() ? '?' + params.toString() : ''}`;
   return request(url, { token });
 }
@@ -294,27 +294,27 @@ export function fetchClienteById(token, id) {
 
 // Crear un nuevo cliente
 export function createCliente(token, data) {
-  return request("/api/clientes", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/clientes", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 // Actualizar un cliente
 export function updateCliente(token, id, data) {
-  return request(`/api/clientes/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/clientes/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 // Eliminar un cliente
 export function deleteCliente(token, id) {
-  return request(`/api/clientes/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/clientes/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -334,27 +334,27 @@ export function fetchCuentaPagarById(token, id) {
 
 // Crear una nueva cuenta por pagar
 export function createCuentaPagar(token, data) {
-  return request("/api/cuentas-pagar", { 
-    method: "POST", 
-    token, 
-    body: data 
+  return request("/api/cuentas-pagar", {
+    method: "POST",
+    token,
+    body: data
   });
 }
 
 // Actualizar una cuenta por pagar
 export function updateCuentaPagar(token, id, data) {
-  return request(`/api/cuentas-pagar/${id}`, { 
-    method: "PUT", 
-    token, 
-    body: data 
+  return request(`/api/cuentas-pagar/${id}`, {
+    method: "PUT",
+    token,
+    body: data
   });
 }
 
 // Eliminar una cuenta por pagar
 export function deleteCuentaPagar(token, id) {
-  return request(`/api/cuentas-pagar/${id}`, { 
-    method: "DELETE", 
-    token 
+  return request(`/api/cuentas-pagar/${id}`, {
+    method: "DELETE",
+    token
   });
 }
 
@@ -367,7 +367,7 @@ export function fetchGastos(token, filters = {}) {
   const params = new URLSearchParams();
   if (filters.fechaInicio) params.append('fechaInicio', filters.fechaInicio);
   if (filters.fechaFin) params.append('fechaFin', filters.fechaFin);
-  
+
   const url = `/api/gastos${params.toString() ? '?' + params.toString() : ''}`;
   return request(url, { token });
 }
@@ -503,6 +503,37 @@ export function saveRecipe(token, menuItemId, items) {
 export function deleteRecipe(token, menuItemId) {
   return request(`/api/recipes/${menuItemId}`, {
     method: "DELETE",
+    token,
+  });
+}
+
+// ============================================
+// ✅ MESAS
+// ============================================
+
+// Obtener todas las mesas con su estado actual
+export function fetchMesas(token) {
+  return request("/api/mesas", { token });
+}
+
+// Obtener una mesa por ID
+export function fetchMesaById(token, id) {
+  return request(`/api/mesas/${id}`, { token });
+}
+
+// Actualizar el estado de una mesa (ocupada, items, total)
+export function updateMesa(token, id, data) {
+  return request(`/api/mesas/${id}`, {
+    method: "PUT",
+    token,
+    body: data,
+  });
+}
+
+// Liberar todas las mesas (útil para admin)
+export function resetMesas(token) {
+  return request("/api/mesas/reset", {
+    method: "POST",
     token,
   });
 }

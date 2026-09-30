@@ -3,19 +3,19 @@ import MesaOrder from "./MesaOrder";
 import { useAuth } from "../context/AuthContext";
 import { fetchMesas, updateMesa } from "../api";
 
-// Importar imágenes desde assets
+// Imágenes desde assets
 import mesa1Img from "../assets/mesa_1.png";
 import mesa2Img from "../assets/mesa_1.png";
 import mesa3Img from "../assets/mesa_1.png";
 import mesa4Img from "../assets/mesa_1.png";
 import "./MesaGridView.css";
 
-// Imágenes para cada mesa (importadas desde assets)
+// Solo imágenes, sin nombres
 const MESA_IMAGES = [
-  { src: mesa1Img, alt: "Mesa 1", name: "Mesa Familiar" },
-  { src: mesa2Img, alt: "Mesa 2", name: "Mesa Ejecutiva" },
-  { src: mesa3Img, alt: "Mesa 3", name: "Mesa VIP" },
-  { src: mesa4Img, alt: "Mesa 4", name: "Mesa Terraza" },
+  { src: mesa1Img, alt: "Mesa 1" },
+  { src: mesa2Img, alt: "Mesa 2" },
+  { src: mesa3Img, alt: "Mesa 3" },
+  { src: mesa4Img, alt: "Mesa 4" },
 ];
 
 export default function MesaGridView() {
@@ -30,7 +30,6 @@ export default function MesaGridView() {
   // ============================================================
   // CARGAR MESAS DESDE EL BACKEND
   // ============================================================
-
   useEffect(() => {
     let cancelled = false;
 
@@ -77,7 +76,6 @@ export default function MesaGridView() {
   // ============================================================
   // HELPERS
   // ============================================================
-
   const updateMesaLocal = (mesaId, changes) => {
     setMesas((prev) =>
       prev.map((m) => (m.id === mesaId ? { ...m, ...changes } : m))
@@ -90,7 +88,6 @@ export default function MesaGridView() {
   // ============================================================
   // ABRIR MESA
   // ============================================================
-
   const handleOpenMesa = async (mesaId) => {
     const changes = {
       isOccupied: true,
@@ -116,7 +113,6 @@ export default function MesaGridView() {
   // ============================================================
   // ACTUALIZAR PEDIDO
   // ============================================================
-
   const handleUpdateOrder = async (mesaId, orderItems, total) => {
     const changes = {
       orderItems,
@@ -136,7 +132,6 @@ export default function MesaGridView() {
   // ============================================================
   // CERRAR MESA
   // ============================================================
-
   const handleCloseMesa = async (mesaId) => {
     const changes = {
       isOccupied: false,
@@ -162,7 +157,6 @@ export default function MesaGridView() {
   // ============================================================
   // GUARDAR VENTA
   // ============================================================
-
   const handleSaved = async (mesaId) => {
     await handleCloseMesa(mesaId);
     setModalKey((prev) => prev + 1);
@@ -171,7 +165,6 @@ export default function MesaGridView() {
   // ============================================================
   // CLICK EN MESA
   // ============================================================
-
   const handleTableClick = (mesa) => {
     setSelectedTable(mesa);
   };
@@ -183,14 +176,12 @@ export default function MesaGridView() {
   // ============================================================
   // SEPARAR MESAS POR ZONA
   // ============================================================
-
   const mesasExternas = mesas.filter((m) => m.zone === "externa");
   const mesasInternas = mesas.filter((m) => m.zone === "interna");
 
   // ============================================================
   // RENDER DE UNA MESA
   // ============================================================
-
   const renderMesaCard = (mesa) => {
     const image = MESA_IMAGES[mesa.imageIndex];
     const isOccupied = mesa.isOccupied;
@@ -209,7 +200,6 @@ export default function MesaGridView() {
         </span>
         <div className="mesa-card-header">
           <span className="mesa-card-number">Mesa {mesa.number}</span>
-          <span className="mesa-card-name">{image.name}</span>
         </div>
         {isOccupied && mesa.order && (
           <div className="mesa-card-details">
@@ -228,7 +218,6 @@ export default function MesaGridView() {
   // ============================================================
   // ESTADOS DE CARGA / ERROR
   // ============================================================
-
   if (status === "loading") {
     return (
       <div className="mesa-grid-view">
@@ -258,20 +247,7 @@ export default function MesaGridView() {
         </span>
       </header>
 
-      {/* ZONA: MESAS EXTERNAS */}
-      <section className="mesa-zone">
-        <h2 className="mesa-zone-title">
-          🌿 Mesas Externas
-          <span className="mesa-zone-count">
-            {mesasExternas.filter((m) => m.isOccupied).length} / {mesasExternas.length}
-          </span>
-        </h2>
-        <div className="mesa-grid-cards">
-          {mesasExternas.map(renderMesaCard)}
-        </div>
-      </section>
-
-      {/* ZONA: MESAS INTERNAS */}
+      {/* ZONA: MESAS INTERNAS (primero) */}
       <section className="mesa-zone">
         <h2 className="mesa-zone-title">
           🏠 Mesas Internas
@@ -281,6 +257,19 @@ export default function MesaGridView() {
         </h2>
         <div className="mesa-grid-cards">
           {mesasInternas.map(renderMesaCard)}
+        </div>
+      </section>
+
+      {/* ZONA: MESAS EXTERNAS (después) */}
+      <section className="mesa-zone">
+        <h2 className="mesa-zone-title">
+          🌿 Mesas Externas
+          <span className="mesa-zone-count">
+            {mesasExternas.filter((m) => m.isOccupied).length} / {mesasExternas.length}
+          </span>
+        </h2>
+        <div className="mesa-grid-cards">
+          {mesasExternas.map(renderMesaCard)}
         </div>
       </section>
 
